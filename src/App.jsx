@@ -250,7 +250,7 @@ function NeedCard({ need, onPropose }) {
   );
 }
 
-// ─── MAIN APP (v0.4) ───
+// ─── MAIN APP (v0.6) ───
 export default function DeineStimmeApp() {
   const [currentUser, setCurrentUser] = useState(null);
   const [view, setView] = useState("themen");
@@ -323,7 +323,7 @@ export default function DeineStimmeApp() {
             <span style={{ fontFamily: T.mono, fontSize: 20, fontWeight: 700, color: T.text }}>stimme</span>
             <span style={{ fontFamily: T.mono, fontSize: 10, color: T.textDim }}>.org</span>
           </div>
-          <p style={{ color: T.textMuted, fontSize: 11, fontFamily: T.mono, margin: "2px 0 0" }}>v0.5 — plattform + werkzeuge</p>
+          <p style={{ color: T.textMuted, fontSize: 11, fontFamily: T.mono, margin: "2px 0 0" }}>v0.6 — plattform + werkzeuge</p>
         </div>
 
         <div style={{ textAlign: "right" }}>
@@ -660,7 +660,7 @@ export default function DeineStimmeApp() {
               const p = { hoch: 0, mittel: 1, niedrig: 2 };
               return p[a.priority] - p[b.priority];
             }).map(n => (
-              <NeedCard key={n.id} need={n} onPropose={(id) => alert(`Vorschlag für ${id} — kommt in v0.5`)} />
+              <NeedCard key={n.id} need={n} onPropose={(id) => alert(`Vorschlag für ${id} — kommt in v0.7`)} />
             ))}
           </div>
 
@@ -698,22 +698,22 @@ export default function DeineStimmeApp() {
 
       {/* ═══ SCHREIBKOMPASS ═══ */}
       {view === "schreibkompass" && (
-        <InviteGate scope="schreibkompass">
+        
           <SchreibkompassTool />
-        </InviteGate>
+        
       )}
 
       {/* ═══ VERTRAGSANALYSE ═══ */}
       {view === "vertragsanalyse" && (
-        <InviteGate scope="vertragsanalyse">
+        
           <VertragsanalyseTool />
-        </InviteGate>
+        
       )}
 
       {/* Footer */}
       <div style={{ marginTop: 40, padding: "16px 0", borderTop: `1px solid ${T.border}`, textAlign: "center" }}>
         <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: 0 }}>die würde des menschen als oberstes gebot — alles weitere lässt sich daraus ableiten</p>
-        <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: "4px 0 0" }}>deinestimme.org — prototyp v0.5 — testversion</p>
+        <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: "4px 0 0" }}>deinestimme.org — prototyp v0.6 — testversion</p>
       </div>
     </div>
   );

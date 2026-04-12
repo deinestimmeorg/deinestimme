@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -10,36 +10,24 @@ import '@fontsource/crimson-pro/400.css';
 import '@fontsource/crimson-pro/600.css';
 
 import LandingPage from './pages/LandingPage';
-import LanguageSelector from './components/LanguageSelector';
+import VerstehenPage from './pages/VerstehenPage';
+import MitbauenPage from './pages/MitbauenPage';
+import InstitutionPage from './pages/InstitutionPage';
 import PasswordGate from './components/PasswordGate';
 import DeineStimmeApp from './App';
 
-function AppRoute() {
-  const [lang, setLang] = useState(() => localStorage.getItem("ds_lang"));
-
-  const handleLanguage = (code) => {
-    localStorage.setItem("ds_lang", code);
-    setLang(code);
-  };
-
-  if (!lang) {
-    return <LanguageSelector onSelect={handleLanguage} />;
-  }
-
-  return (
-    <PasswordGate>
-      <DeineStimmeApp />
-    </PasswordGate>
-  );
-}
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/app/*" element={<AppRoute />} />
-      </Routes>
-    </BrowserRouter>
+    <PasswordGate>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/app/*" element={<DeineStimmeApp />} />
+          <Route path="/verstehen" element={<VerstehenPage />} />
+          <Route path="/mitbauen" element={<MitbauenPage />} />
+          <Route path="/institution" element={<InstitutionPage />} />
+        </Routes>
+      </BrowserRouter>
+    </PasswordGate>
   </React.StrictMode>
 );

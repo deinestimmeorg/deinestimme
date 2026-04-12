@@ -73,7 +73,7 @@ export default function LanguageSelector({ onSelect }) {
 export const translations = {
   de: {
     passwordTitle: "Geschlossener Testbereich",
-    passwordSub: "prototyp v0.5 — einladung erforderlich",
+    passwordSub: "prototyp v0.6 — einladung erforderlich",
     passwordPlaceholder: "Zugangscode eingeben...",
     passwordButton: "eintreten",
     passwordWrong: "falscher code — bitte erneut versuchen",
@@ -102,7 +102,7 @@ export const translations = {
   },
   en: {
     passwordTitle: "Closed test area",
-    passwordSub: "prototype v0.5 — invitation required",
+    passwordSub: "prototype v0.6 — invitation required",
     passwordPlaceholder: "Enter access code...",
     passwordButton: "enter",
     passwordWrong: "wrong code — please try again",
@@ -131,7 +131,7 @@ export const translations = {
   },
   id: {
     passwordTitle: "Area uji tertutup",
-    passwordSub: "prototipe v0.5 — undangan diperlukan",
+    passwordSub: "prototipe v0.6 — undangan diperlukan",
     passwordPlaceholder: "Masukkan kode akses...",
     passwordButton: "masuk",
     passwordWrong: "kode salah — silakan coba lagi",

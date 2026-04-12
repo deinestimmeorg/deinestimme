@@ -27,12 +27,12 @@ const AUDIO_FILES = {
 
 const AUDIO_DURATIONS = { de: 53.3, en: 42.7, fr: 44.4, es: 46.2, nl: 49.6, id: 55.7 };
 
-// Door link targets — adjust when routes are final
+// Door link targets
 const DOOR_LINKS = {
-  0: "/app",       // Alltag → App
-  1: null,         // Verstehen → Unterseite (kommt noch)
-  2: "/app",       // Mitbauen → App
-  3: "mailto:hello@deinestimme.org?subject=Pilotprojekt", // Institution → Mail
+  0: "/app",           // Alltag → Platform
+  1: "/verstehen",     // Verstehen → Explanation
+  2: "/mitbauen",      // Mitbauen → Build with us
+  3: "/institution",   // Institution → Use cases
 };
 
 function useIsMobile(breakpoint = 640) {
@@ -358,7 +358,7 @@ function ManifestSequence({ lines, lang, isMobile }) {
   );
 }
 
-function DoorCard({ tag, text, btn, index, isMobile }) {
+function DoorCard({ tag, text, btn, index, isMobile, lang }) {
   const ref = useRef(null);
   const [vis, setVis] = useState(false);
   const [hover, setHover] = useState(false);
@@ -375,7 +375,7 @@ function DoorCard({ tag, text, btn, index, isMobile }) {
     const link = DOOR_LINKS[index];
     if (!link) return;
     if (link.startsWith("mailto:")) window.location.href = link;
-    else navigate(link);
+    else navigate(`${link}?lang=${lang}`);
   };
 
   return (
@@ -522,7 +522,7 @@ export default function DeineStimmeLanding() {
           gap: isMobile ? "12px" : "20px",
         }}>
           {c.doors.map((d, i) => (
-            <DoorCard key={`${lang}-${i}`} tag={d.tag} text={d.text} btn={d.btn} index={i} isMobile={isMobile} />
+            <DoorCard key={`${lang}-${i}`} tag={d.tag} text={d.text} btn={d.btn} index={i} isMobile={isMobile} lang={lang} />
           ))}
         </div>
         <div style={{ textAlign: "center", marginTop: isMobile ? "32px" : "48px" }}>
