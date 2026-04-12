@@ -32,6 +32,13 @@ CREATE TABLE IF NOT EXISTS proposals (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+-- v0.4 Spalten nachrüsten falls Tabelle schon existierte
+DO $$
+BEGIN
+  ALTER TABLE proposals ADD COLUMN IF NOT EXISTS phase TEXT DEFAULT 'neutral';
+  ALTER TABLE proposals ADD COLUMN IF NOT EXISTS ratio REAL DEFAULT 0.5;
+END $$;
+
 -- 4. Wirkungsanalyse (Chancen, Gefahren, Lösungen)
 CREATE TABLE IF NOT EXISTS impacts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -62,7 +69,18 @@ ALTER TABLE impacts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE votes ENABLE ROW LEVEL SECURITY;
 
 -- 7. Policies: Alle können lesen, nur authentifizierte können schreiben
--- (Für den Prototyp: anon kann alles — wird für Produktion verschärft)
+-- (DROP zuerst falls schon vorhanden)
+DROP POLICY IF EXISTS "Alle können Profile sehen" ON profiles;
+DROP POLICY IF EXISTS "Alle können Profile erstellen" ON profiles;
+DROP POLICY IF EXISTS "Alle können Themen sehen" ON topics;
+DROP POLICY IF EXISTS "Alle können Themen erstellen" ON topics;
+DROP POLICY IF EXISTS "Alle können Vorschläge sehen" ON proposals;
+DROP POLICY IF EXISTS "Alle können Vorschläge erstellen" ON proposals;
+DROP POLICY IF EXISTS "Alle können Impacts sehen" ON impacts;
+DROP POLICY IF EXISTS "Alle können Impacts erstellen" ON impacts;
+DROP POLICY IF EXISTS "Alle können Votes sehen" ON votes;
+DROP POLICY IF EXISTS "Alle können Votes erstellen" ON votes;
+
 CREATE POLICY "Alle können Profile sehen" ON profiles FOR SELECT USING (true);
 CREATE POLICY "Alle können Profile erstellen" ON profiles FOR INSERT WITH CHECK (true);
 
@@ -78,12 +96,22 @@ CREATE POLICY "Alle können Impacts erstellen" ON impacts FOR INSERT WITH CHECK 
 CREATE POLICY "Alle können Votes sehen" ON votes FOR SELECT USING (true);
 CREATE POLICY "Alle können Votes erstellen" ON votes FOR INSERT WITH CHECK (true);
 
--- 8. Realtime aktivieren für Live-Updates
-ALTER PUBLICATION supabase_realtime ADD TABLE proposals;
-ALTER PUBLICATION supabase_realtime ADD TABLE votes;
+-- 8. Realtime aktivieren (idempotent — ignoriert Fehler wenn schon aktiv)
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE proposals;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- 9. Erstes Thema anlegen
-INSERT INTO topics (title, description) VALUES (
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE votes;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- 9. Erstes Thema anlegen (nur wenn noch keins existiert)
+INSERT INTO topics (title, description)
+SELECT
   'Dauerhafte Normalzeit (MEZ, UTC+1) + gesetzlicher Anspruch auf Gleitzeit',
   'Soll Deutschland dauerhaft zur Normalzeit (Winterzeit, MEZ/UTC+1) zurückkehren und gleichzeitig einen gesetzlichen Anspruch auf Gleitzeit einführen?'
-);
+WHERE NOT EXISTS (SELECT 1 FROM topics LIMIT 1);

@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>◌ Glyphen-Schreibkompass v4</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#0a0a0c; --surface:#0f0f12; --border:#1a1a1e; --border-hover:#2a2a30;
+  --text:#d0d0d0; --text-dim:#666; --text-muted:#444; --accent:#00C9B0;
+  --red:#fc3d21; --gold:#E8A838; --blue:#4A9EDB; --coral:#E24B4A;
+  --mono:'DM Mono',monospace;
+  --c-aneignung:#4A9EDB; --c-transformation:#E8A838; --c-erschaffung:#00C9B0;
+  --c-aufmerksamkeit:#E24B4A; --c-stasis:#888;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:220px 1fr 300px;grid-template-rows:auto 1fr auto;height:100vh}
+.header{grid-column:1/-1;padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:baseline;gap:8px}
+.header h1{font-size:13px;font-weight:400;color:var(--accent);letter-spacing:.08em}
+.header .ver{font-size:9px;color:var(--text-muted)}
+.header-right{display:flex;align-items:center;gap:16px}
+.clock{font-size:11px;color:var(--text-dim);letter-spacing:.05em}
+.clock-date{font-size:9px;color:var(--text-muted);margin-left:8px}
+
+/* Nav tabs */
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{background:none;border:1px solid transparent;border-radius:4px;padding:4px 10px;font-family:var(--mono);font-size:9px;color:var(--text-muted);cursor:pointer;transition:all .2s}
+.nav-tab:hover{color:var(--text-dim)}
+.nav-tab.active{color:var(--accent);border-color:var(--border-hover);background:var(--surface)}
+
+/* ── LEFT PANEL ── */
+.left-panel{grid-column:1;grid-row:2;border-right:1px solid var(--border);padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.section-title{font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.12em;margin:8px 0 6px}
+
+.entity-tag{position:relative;padding:7px 9px;background:var(--surface);border:1px solid var(--border);border-radius:5px;cursor:pointer;transition:all .5s;overflow:hidden}
+.entity-tag::before{content:'';position:absolute;inset:0;border-radius:5px;opacity:0;transition:opacity .8s}
+.entity-tag.active{border-color:var(--accent)}
+.entity-tag.active::before{opacity:1;animation:tagPulse 2.5s ease-in-out infinite;background:radial-gradient(ellipse at center,rgba(0,201,176,.08) 0%,transparent 70%)}
+.entity-tag.fading{opacity:.4;border-color:var(--border);transform:scale(.97)}
+.entity-tag.gone{opacity:.15;border-color:transparent;transform:scale(.94);filter:grayscale(1)}
+.entity-tag .e-name{font-size:10px;color:var(--text);font-weight:400;position:relative;z-index:1}
+.entity-tag .e-meta{font-size:7px;color:var(--text-muted);margin-top:2px;position:relative;z-index:1}
+.entity-tag .e-freq{position:absolute;top:5px;right:7px;font-size:7px;color:var(--text-muted);z-index:1}
+.entity-tag .e-dot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.entity-tag.active .e-dot{background:var(--accent);box-shadow:0 0 5px var(--accent)}
+.entity-tag.fading .e-dot{background:var(--gold)}
+.entity-tag.gone .e-dot{background:var(--text-muted)}
+.entity-tag .e-links{display:none;margin-top:5px;padding-top:5px;border-top:1px solid var(--border);position:relative;z-index:1}
+.entity-tag.expanded .e-links{display:block}
+.entity-tag .e-links a{display:block;font-size:8px;color:var(--blue);text-decoration:none;padding:2px 0;opacity:.7}
+.entity-tag .e-links a:hover{opacity:1}
+.entity-empty{font-size:9px;color:var(--text-muted);line-height:1.6;padding:6px;opacity:.5}
+.entity-legend{margin-top:auto;padding-top:8px;border-top:1px solid var(--border)}
+.entity-legend div{font-size:7px;color:var(--text-muted);margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.leg-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+
+@keyframes tagPulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* Drift alert */
+.drift-alert{position:fixed;top:50px;left:50%;transform:translateX(-50%);background:#1a0a0a;border:1px solid #3a1515;border-radius:8px;padding:10px 16px;display:none;align-items:center;gap:10px;z-index:100;max-width:500px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.drift-alert.show{display:flex}
+.drift-alert .da-icon{font-size:16px;color:var(--coral);flex-shrink:0}
+.drift-alert .da-txt{font-size:10px;color:var(--coral);line-height:1.5}
+.drift-alert .da-btn{background:none;border:1px solid var(--coral);color:var(--coral);font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:4px;cursor:pointer;flex-shrink:0}
+.drift-alert .da-btn:hover{background:var(--coral);color:var(--bg)}
+
+/* ── CENTER ── */
+.center{grid-column:2;grid-row:2;display:flex;flex-direction:column;position:relative}
+
+/* Save bar */
+.save-bar{display:flex;align-items:center;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+.save-btn{background:none;border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:9px;padding:4px 12px;border-radius:4px;cursor:pointer;transition:all .2s}
+.save-btn:hover{background:var(--accent);color:var(--bg)}
+.save-status{font-size:8px;color:var(--text-muted)}
+.title-input{flex:1;background:none;border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:10px;outline:none}
+.title-input:focus{border-color:var(--accent)}
+.title-input::placeholder{color:var(--text-muted)}
+
+/* Editor */
+.editor-area{flex:1;position:relative;padding:16px;overflow:hidden}
+.editor-area textarea{width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:var(--text);font-family:var(--mono);font-size:16px;line-height:2;letter-spacing:.02em}
+.editor-area textarea::placeholder{color:var(--text-muted)}
+.editor-wpm{position:absolute;bottom:6px;right:16px;font-size:8px;color:var(--text-muted)}
+
+/* Preview overlay */
+.preview-panel{flex:1;padding:16px;overflow-y:auto;display:none;font-size:15px;line-height:2;letter-spacing:.02em}
+.preview-panel.show{display:block}
+.preview-panel .hl-entity{border-bottom:1px dashed var(--accent);color:var(--accent);cursor:help}
+.preview-panel .hl-transform{border-bottom:1px dashed var(--gold);color:var(--gold)}
+.preview-panel .hl-aneignung{border-bottom:1px dashed var(--c-aneignung);color:var(--c-aneignung)}
+.preview-panel .hl-erschaffung{border-bottom:1px dashed var(--c-erschaffung);color:var(--c-erschaffung)}
+.preview-panel .hl-aufmerksamkeit{border-bottom:1px dashed var(--c-aufmerksamkeit);color:var(--c-aufmerksamkeit)}
+.preview-panel .hl-stasis{border-bottom:1px dashed var(--c-stasis);color:var(--c-stasis)}
+.preview-panel .hl-link{color:var(--blue);text-decoration:underline;cursor:pointer}
+.preview-panel .hl-redundant{background:rgba(226,75,74,.08);border-left:2px solid var(--coral);padding-left:4px;display:inline}
+.preview-panel .hl-novel{background:rgba(0,201,176,.06);border-left:2px solid var(--accent);padding-left:4px;display:inline}
+
+/* Journal view */
+.journal-view{grid-column:2;grid-row:2;overflow-y:auto;padding:16px;display:none}
+.journal-view.show{display:block}
+.j-entry{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:10px;cursor:pointer;transition:border-color .2s}
+.j-entry:hover{border-color:var(--border-hover)}
+.j-entry-title{font-size:12px;color:var(--text);margin-bottom:4px}
+.j-entry-date{font-size:8px;color:var(--text-muted);margin-bottom:6px}
+.j-entry-preview{font-size:9px;color:var(--text-dim);line-height:1.6;max-height:40px;overflow:hidden}
+.j-entry-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.j-entry-tag{font-size:7px;padding:2px 6px;border-radius:3px;background:rgba(0,201,176,.1);color:var(--accent);border:1px solid rgba(0,201,176,.2)}
+.j-entry-stats{display:flex;gap:8px;margin-top:6px}
+.j-stat{font-size:7px;color:var(--text-muted)}
+.j-stat b{color:var(--text-dim);font-weight:400}
+.j-evolution{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:16px}
+.j-evo-title{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.j-evo-chart{height:60px;display:flex;align-items:flex-end;gap:2px}
+.j-evo-bar{min-width:6px;border-radius:2px 2px 0 0;transition:height .3s;position:relative}
+.j-evo-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);font-size:7px;color:var(--text);background:var(--bg);border:1px solid var(--border);padding:2px 5px;border-radius:3px;white-space:nowrap;z-index:10}
+.j-related{margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.j-related-title{font-size:8px;color:var(--text-muted);margin-bottom:4px}
+.j-related-item{font-size:8px;color:var(--blue);cursor:pointer;padding:2px 0}
+.j-related-item:hover{text-decoration:underline}
+.j-empty{font-size:10px;color:var(--text-muted);padding:20px;text-align:center;opacity:.5;line-height:1.8}
+
+/* ── RIGHT PANEL ── */
+.right-panel{grid-column:3;grid-row:2;border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.right-title{font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.12em;padding:10px 12px 6px}
+.wiki-card{padding:10px 12px;border-bottom:1px solid var(--border);animation:fadeSlide .4s ease}
+.wiki-card .wc-title{font-size:11px;color:var(--accent);font-weight:400;margin-bottom:3px;cursor:pointer}
+.wiki-card .wc-title:hover{text-decoration:underline}
+.wiki-card .wc-extract{font-size:9px;color:var(--text-dim);line-height:1.7;margin-bottom:4px}
+.wiki-card .wc-thumb{width:100%;max-height:120px;object-fit:cover;border-radius:3px;margin-bottom:5px;opacity:.8}
+.wiki-card .wc-link{font-size:7px;color:var(--blue);text-decoration:none;opacity:.6}
+.wiki-card .wc-link:hover{opacity:1}
+.wiki-empty{padding:12px;font-size:9px;color:var(--text-muted);line-height:1.7;opacity:.5}
+
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BOTTOM ── */
+.bottom{grid-column:1/-1;grid-row:3;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1.2fr .9fr 1.1fr 1.1fr .7fr;gap:0;max-height:150px;overflow:hidden}
+.bottom .panel{padding:8px 12px;border-right:1px solid var(--border)}
+.bottom .panel:last-child{border-right:none}
+.panel-title{font-size:7px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+
+/* Glyphs */
+.glyph-row{display:flex;gap:3px;flex-wrap:wrap}
+.glyph-mini{width:26px;height:26px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted);transition:all .4s}
+.glyph-mini.active{border-color:var(--accent);color:var(--accent);background:rgba(0,201,176,.06)}
+.hist-row{display:flex;gap:1px;flex-wrap:wrap;margin-top:5px}
+.hist-dot{width:4px;height:4px;border-radius:1px}
+
+/* Shannon */
+.sh-row{display:flex;gap:10px;margin-bottom:5px}
+.sh-item{text-align:center}
+.sh-val{font-size:13px;font-weight:300;color:var(--text-dim)}
+.sh-val.hl{color:var(--accent)}
+.sh-lbl{font-size:6px;color:var(--text-muted);margin-top:1px}
+.char-bars{display:flex;align-items:flex-end;gap:1px;height:40px;border-bottom:1px solid var(--border);padding-bottom:1px;margin-top:4px}
+.char-bar{min-width:3px;border-radius:1px 1px 0 0;transition:height .4s}
+.char-labels{display:flex;gap:1px;font-size:5px;color:var(--text-muted);margin-top:1px}
+.char-lbl{min-width:3px;text-align:center;overflow:hidden}
+
+/* Temperature */
+.temp-row{display:flex;align-items:center;gap:8px}
+.temp-bar{width:14px;height:50px;background:var(--border);border-radius:7px;position:relative;overflow:hidden}
+.temp-fill{position:absolute;bottom:0;left:0;right:0;border-radius:0 0 7px 7px;transition:height .6s,background .6s}
+.temp-val{font-size:14px;font-weight:300;color:var(--text-dim)}
+.temp-val.hot{color:var(--gold)}.temp-val.cold{color:var(--blue)}
+.temp-lbl{font-size:7px;color:var(--text-muted);margin-top:2px}
+
+/* Rhetoric */
+.rhet-bar-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.rhet-fill{height:100%;border-radius:2px;transition:width .6s,background .6s}
+.rhet-labels{display:flex;justify-content:space-between;font-size:6px;color:var(--text-muted)}
+.rhet-state{font-size:9px;color:var(--text-dim);margin-top:4px}
+
+/* Speed */
+.speed-val{font-size:14px;font-weight:300;color:var(--text-dim)}
+.speed-lbl{font-size:7px;color:var(--text-muted)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>◌ Glyphen-Schreibkompass</h1>
+      <span class="ver">v4.2 — Objekte · Konzept-Redundanz · Rhetorik · Drift</span>
+    </div>
+    <div class="header-right">
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchView('write')" id="tabWrite">Schreiben</button>
+        <button class="nav-tab" onclick="switchView('preview')" id="tabPreview">Vorschau</button>
+        <button class="nav-tab" onclick="switchView('journal')" id="tabJournal">Tagebuch</button>
+      </div>
+      <div>
+        <span class="clock" id="clock"></span>
+        <span class="clock-date" id="clockDate"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRIFT ALERT -->
+  <div class="drift-alert" id="driftAlert">
+    <div class="da-icon">⟳</div>
+    <div class="da-txt" id="driftMsg">Du bist seit einer Weile im selben Modus. Kurz stoppen, Energie sammeln?</div>
+    <button class="da-btn" onclick="dismissDrift()">Gesehen</button>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel" id="leftPanel">
+    <div class="section-title">Objekte & Transformatoren</div>
+    <div class="entity-empty" id="entityEmpty">Beginne zu schreiben.<br/>Erkannte Objekte pulsieren hier.<br/>Wenn sie verschwinden — du bist abgedriftet.</div>
+    <div id="entityList"></div>
+    <div class="entity-legend" id="entityLegend" style="display:none">
+      <div><span class="leg-dot" style="background:var(--accent);box-shadow:0 0 3px var(--accent)"></span> Aktiv</div>
+      <div><span class="leg-dot" style="background:var(--gold)"></span> Verblasst</div>
+      <div><span class="leg-dot" style="background:var(--text-muted)"></span> Verloren</div>
+    </div>
+  </div>
+
+  <!-- CENTER: Write -->
+  <div class="center" id="centerWrite">
+    <div class="save-bar">
+      <input class="title-input" id="entryTitle" placeholder="Titel (optional)…"/>
+      <button class="save-btn" onclick="saveEntry()" id="saveBtn">◌ Speichern</button>
+      <span class="save-status" id="saveStatus"></span>
+    </div>
+    <div class="editor-area" id="editorArea">
+      <textarea id="editor" placeholder="Schreibe hier… der Kompass liest mit.&#10;&#10;Links einfügen: einfach die URL tippen (https://…)&#10;Der Kompass erkennt sie automatisch."></textarea>
+      <div class="editor-wpm" id="wpmInd"></div>
+    </div>
+    <div class="preview-panel" id="previewPanel"></div>
+  </div>
+
+  <!-- CENTER: Journal (hidden by default) -->
+  <div class="journal-view" id="journalView">
+    <div class="j-evolution" id="jEvolution" style="display:none">
+      <div class="j-evo-title">Schreibstil-Entwicklung</div>
+      <div class="j-evo-chart" id="jEvoChart"></div>
+    </div>
+    <div id="journalList"></div>
+    <div class="j-empty" id="jEmpty">Noch keine Einträge.<br/>Schreibe etwas und drücke Speichern.</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel" id="rightPanel">
+    <div class="right-title">Information & Kontext</div>
+    <div class="wiki-empty" id="wikiEmpty">Wikipedia-Auszüge erscheinen hier für erkannte Objekte.</div>
+    <div id="wikiList"></div>
+  </div>
+
+  <!-- BOTTOM PANELS -->
+  <div class="bottom">
+    <div class="panel">
+      <div class="panel-title">Glyph-Modus</div>
+      <div class="glyph-row" id="glyphRow"></div>
+      <div class="hist-row" id="histRow"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Shannon-Analyse</div>
+      <div class="sh-row">
+        <div class="sh-item"><div class="sh-val" id="shH">—</div><div class="sh-lbl">H</div></div>
+        <div class="sh-item"><div class="sh-val" id="shH0">—</div><div class="sh-lbl">H₀</div></div>
+        <div class="sh-item"><div class="sh-val" id="shR">—</div><div class="sh-lbl">R%</div></div>
+      </div>
+      <div class="char-bars" id="charBars"></div>
+      <div class="char-labels" id="charLabels"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Temperatur</div>
+      <div class="temp-row">
+        <div class="temp-bar"><div class="temp-fill" id="tempFill"></div></div>
+        <div><div class="temp-val" id="tempVal">—</div><div class="temp-lbl" id="tempLbl">W-Entropie · Tri · Quad</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Rhetorik IST↔Transform</div>
+      <div class="rhet-bar-wrap"><div class="rhet-fill" id="rhetFill" style="width:50%;background:var(--text-muted)"></div></div>
+      <div class="rhet-labels"><span>IST</span><span>Transform</span></div>
+      <div class="rhet-state" id="rhetState">—</div>
+      <div style="margin-top:4px;display:flex;gap:8px">
+        <span style="font-size:7px;color:var(--coral)">IST: <b id="rhetIST" style="font-weight:400">0</b></span>
+        <span style="font-size:7px;color:var(--accent)">TRF: <b id="rhetTRF" style="font-weight:400">0</b></span>
+        <span style="font-size:7px;color:var(--text-muted)">Ratio: <b id="rhetRatio" style="font-weight:400">—</b></span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Konzept-Redundanz</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+        <div class="speed-val" id="crScore">—</div>
+        <div class="speed-lbl">Wiederholung</div>
+      </div>
+      <div style="font-size:7px;color:var(--text-muted);margin-bottom:3px">
+        Thesen: <span id="crTheses" style="color:var(--text-dim)">—</span> · 
+        Neue/Absatz: <span id="crNovelty" style="color:var(--text-dim)">—</span>
+      </div>
+      <div class="rhet-bar-wrap"><div class="rhet-fill" id="crBar" style="width:0;background:var(--accent)"></div></div>
+      <div class="rhet-labels"><span>redundant</span><span>dicht</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Tempo</div>
+      <div style="display:flex;align-items:baseline;gap:4px"><div class="speed-val" id="speedVal">—</div><div class="speed-lbl">W/Min</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// SCHREIBKOMPASS v4
+// ═══════════════════════════════════════
+
+const GLYPHS=[
+  {id:'aneignung',sym:'·',lbl:'Aneignung',col:'#4A9EDB'},
+  {id:'transformation',sym:'↻',lbl:'Transformation',col:'#E8A838'},
+  {id:'erschaffung',sym:'—·',lbl:'Erschaffung',col:'#00C9B0'},
+  {id:'aufmerksamkeit',sym:'◎',lbl:'Aufmerksamkeit',col:'#E24B4A'},
+  {id:'stasis',sym:'○',lbl:'Stasis',col:'#888'},
+];
+
+const PATTERNS={
+  aneignung:/\b(vielleicht|könnte|möglicherweise|was\s+wenn|frage|warum|wieso|wie\s+funktioniert|was\s+ist|wer\s+ist|angenommen|vermutlich)\b/gi,
+  transformation:/\b(also|das\s+heißt|deshalb|deswegen|daher|folglich|somit|weil|denn|dadurch|im\s+vergleich|andererseits|hingegen|während|obwohl|verbindet|verknüpft|übergang)\b/gi,
+  erschaffung:/\b(ist\s+ein|definiert\s+als|bedeutet|nennt\s+man|bezeichnet|gilt\s+als|stellt\s+dar|mein\s+vorschlag|ich\s+definiere|das\s+prinzip|die\s+regel|framework|konzept|these|grundsatz)\b/gi,
+  aufmerksamkeit:/\b(wichtig|entscheidend|muss|zwingend|kritisch|essentiell|zentral|hauptsächlich|vor\s+allem|besonders|achtung|beachte|nie\s+vergessen|priorität|fokus)\b/gi,
+  stasis:/\b(wird\s+gemacht|wurde\s+durchgeführt|ist\s+zu\s+beachten|in\s+anbetracht|unter\s+berücksichtigung|im\s+rahmen|hinsichtlich|bezüglich|diesbezüglich|nichtsdestotrotz)\b/gi,
+};
+
+const KNOWN_ENTITIES={
+  'Europäische Union':['EU','Europäische Union','Europäischen Union','European Union'],
+  'Bundesregierung':['Bundesregierung','Bund','Bundesrepublik'],
+  'Bundestag':['Bundestag','Bundestagswahl'],
+  'Bundesrat':['Bundesrat'],
+  'Länder':['Bundesländer','Bundesland','Länder','Landesregierung'],
+  'Kommunen':['Kommunen','Kommune','Gemeinde','Gemeinden','Kommunalverwaltung'],
+  'Europaparlament':['Europaparlament','Europawahl','EU-Parlament'],
+  'NATO':['NATO','Nato'],
+  'Vereinte Nationen':['UN','UNO','Vereinte Nationen','United Nations'],
+  'Künstliche Intelligenz':['KI','AI','Künstliche Intelligenz','Artificial Intelligence','Machine Learning','LLM'],
+  'Blockchain':['Blockchain','Bitcoin','Ethereum','Kryptowährung'],
+  'Datenschutz':['Datenschutz','DSGVO','GDPR','Privacy'],
+  'Energiewende':['Energiewende','Erneuerbare','Solar','Windkraft'],
+  'Infrastruktur':['Infrastruktur','Stromnetz','Übertragungsnetz','TenneT','50Hertz','Amprion','TransnetBW'],
+  'Grundeinkommen':['UBI','Grundeinkommen','Bürgergeld','Universal Basic Income'],
+  'Bildung':['Bildung','Bildungssystem','Schule','Universität'],
+  'Gesundheit':['Gesundheit','Gesundheitssystem','Krankenversicherung'],
+  'Demokratie':['Demokratie','demokratisch','Bürgerbeteiligung','Partizipation'],
+  'Menschenwürde':['Menschenwürde','Würde','Grundrechte','Menschenrechte'],
+  'DeineStimme':['DeineStimme','deinestimme','deinestimme.org'],
+  'Prototype Fund':['Prototype Fund','Prototypefund'],
+  'Shannon':['Shannon','Entropie','Informationstheorie'],
+  'SIMBA':['SIMBA','Simba'],
+  'Glyphen':['Glyphen','Glyph','Glyphe','Schreibkompass'],
+};
+
+// ── State ──
+let entities={};
+let glyphHist=[];
+let wordTimestamps=[];
+let lastText='';
+let lastAnalysis=0;
+let wikiCache={};
+let currentView='write';
+let journal=[];
+let driftDismissed=false;
+let driftCount=0;
+
+// ── Storage keys ──
+const STORE_KEY='schreibkompass_journal';
+
+// ── Init ──
+function init(){
+  const gr=document.getElementById('glyphRow');
+  GLYPHS.forEach(g=>{
+    const d=document.createElement('div');
+    d.className='glyph-mini';d.id='gm-'+g.id;d.textContent=g.sym;d.title=g.lbl;
+    gr.appendChild(d);
+  });
+  document.getElementById('editor').addEventListener('input',onInput);
+  loadJournal();
+  updateClock();
+  setInterval(updateClock,1000);
+  setInterval(decayEntities,2000);
+}
+
+// ── Clock ──
+function updateClock(){
+  const now=new Date();
+  // UTC+2 (CEST)
+  const utc=now.getTime()+now.getTimezoneOffset()*60000;
+  const cest=new Date(utc+2*3600000);
+  const h=String(cest.getHours()).padStart(2,'0');
+  const m=String(cest.getMinutes()).padStart(2,'0');
+  const s=String(cest.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent=h+':'+m+':'+s+' UTC+2';
+  const days=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  document.getElementById('clockDate').textContent=
+    days[cest.getDay()]+', '+cest.getDate()+'. '+months[cest.getMonth()]+' '+cest.getFullYear();
+}
+
+// ── View switching ──
+function switchView(v){
+  currentView=v;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('active');
+  
+  document.getElementById('centerWrite').style.display=v==='write'||v==='preview'?'flex':'none';
+  document.getElementById('journalView').style.display=v==='journal'?'block':'none';
+  document.getElementById('journalView').className='journal-view'+(v==='journal'?' show':'');
+  
+  document.getElementById('editorArea').style.display=v==='write'?'block':'none';
+  document.getElementById('previewPanel').className='preview-panel'+(v==='preview'?' show':'');
+  
+  if(v==='preview') renderPreview();
+  if(v==='journal') renderJournal();
+}
+
+// ═══════════════════════════════════════
+// MAIN INPUT
+// ═══════════════════════════════════════
+function onInput(){
+  const text=document.getElementById('editor').value;
+  const now=Date.now();
+  if(now-lastAnalysis<300)return;
+  lastAnalysis=now;
+
+  // WPM
+  const words=text.trim().split(/\s+/).filter(Boolean).length;
+  if(text.length>lastText.length){
+    const nw=text.slice(lastText.length).trim().split(/\s+/).filter(Boolean).length;
+    for(let i=0;i<nw;i++)wordTimestamps.push(now);
+  }
+  lastText=text;
+  const recent=wordTimestamps.filter(t=>now-t<30000);
+  const wpm=recent.length>1?Math.round(recent.length/((now-recent[0])/60000)):0;
+  document.getElementById('wpmInd').textContent=wpm>0?wpm+' W/Min':'';
+  document.getElementById('speedVal').textContent=wpm>0?wpm:'—';
+
+  if(text.length<5)return;
+  extractEntities(text,now);
+  const w500=text.slice(-500);
+  const fullText=text; // temperature needs full text for accurate n-gram detection
+  analyzeGlyphs(w500);
+  analyzeShannon(w500);
+  analyzeTemperature(fullText);
+  analyzeRhetoric(fullText);
+  analyzeConceptRedundancy(fullText);
+  renderEntities();
+}
+
+// ═══════════════════════════════════════
+// ENTITY EXTRACTION
+// ═══════════════════════════════════════
+function extractEntities(text,now){
+  const chunk=text.slice(-800);
+  for(const[canonical,aliases]of Object.entries(KNOWN_ENTITIES)){
+    for(const alias of aliases){
+      const rx=new RegExp('\\b'+escapeRx(alias)+'\\b','gi');
+      if(rx.test(chunk)){upsertEntity(canonical,now,alias);break;}
+    }
+  }
+  const caps=chunk.match(/\b[A-ZÄÖÜ][a-zäöüß]+(?:\s+[A-ZÄÖÜ][a-zäöüß]+){0,3}\b/g)||[];
+  const stop=new Set(['Der','Die','Das','Ein','Eine','Und','Oder','Aber','Wenn','Weil','Dass','Nach','Vor','Bei','Mit','Für','Über','Unter','Durch','Gegen','Ohne','Zwischen','Hier','Dort','Dann','Also','Denn','Noch','Schon','Auch','Nur','Nicht','Sehr','Viel','Mehr','Mein','Dein','Sein','Ihr','Wie','Was','Wer','Diese','Dieser','Dieses','Jetzt','Heute','Morgen','Gestern','Immer','Alle','Alles','Andere','Ganz','Neue','Neuen','Guten','Ersten','Einige','Viele','Wenige','Manche']);
+  for(const cap of caps){
+    if(stop.has(cap.split(/\s+/)[0])||cap.length<4)continue;
+    let known=false;
+    for(const als of Object.values(KNOWN_ENTITIES))if(als.some(a=>a.toLowerCase()===cap.toLowerCase())){known=true;break;}
+    if(!known)upsertEntity(cap,now,cap);
+  }
+}
+function upsertEntity(name,now,alias){
+  if(!entities[name]){
+    entities[name]={name,matchedAlias:alias,firstSeen:now,lastSeen:now,count:1,wikiData:null,expanded:false,status:'active'};
+    fetchWiki(name);
+  }else{entities[name].lastSeen=now;entities[name].count++;entities[name].status='active';}
+}
+function escapeRx(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function decayEntities(){
+  const now=Date.now();
+  for(const e of Object.values(entities)){
+    const age=now-e.lastSeen;
+    e.status=age<8000?'active':age<25000?'fading':'gone';
+  }
+  renderEntities();
+}
+
+// ═══════════════════════════════════════
+// WIKIPEDIA
+// ═══════════════════════════════════════
+async function fetchWiki(name){
+  if(wikiCache[name]){entities[name].wikiData=wikiCache[name];renderWiki();return;}
+  for(const lang of['de','en']){
+    try{
+      const r=await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`);
+      if(r.ok){
+        const d=await r.json();
+        if(d.extract){
+          const w={title:d.title,extract:d.extract.slice(0,280)+(d.extract.length>280?'…':''),thumbnail:d.thumbnail?d.thumbnail.source:null,url:d.content_urls?.desktop?.page||'',lang};
+          wikiCache[name]=w;if(entities[name])entities[name].wikiData=w;renderWiki();return;
+        }
+      }
+    }catch(e){}
+  }
+}
+
+// ═══════════════════════════════════════
+// RENDER ENTITIES
+// ═══════════════════════════════════════
+function renderEntities(){
+  const list=document.getElementById('entityList'),empty=document.getElementById('entityEmpty'),legend=document.getElementById('entityLegend');
+  const sorted=Object.values(entities).sort((a,b)=>{
+    const o={active:0,fading:1,gone:2};
+    return(o[a.status]||0)-(o[b.status]||0)||b.lastSeen-a.lastSeen;
+  });
+  if(!sorted.length){empty.style.display='block';legend.style.display='none';list.innerHTML='';return;}
+  empty.style.display='none';legend.style.display='block';
+  list.innerHTML=sorted.map(e=>{
+    const cls=`entity-tag ${e.status}${e.expanded?' expanded':''}`;
+    const wl=e.wikiData?`<a href="${e.wikiData.url}" target="_blank">Wikipedia ↗</a>`:'';
+    const gl=`<a href="https://www.google.com/search?q=${encodeURIComponent(e.name)}" target="_blank">Google ↗</a>`;
+    return`<div class="${cls}" onclick="toggleEntity('${e.name.replace(/'/g,"\\'")}')" data-entity="${e.name}">
+      <span class="e-dot"></span><span class="e-name">${e.name}</span><span class="e-freq">${e.count}×</span>
+      <div class="e-meta">${e.status==='active'?'aktiv':e.status==='fading'?'verblasst…':'verloren'}</div>
+      <div class="e-links">${wl}${gl}</div></div>`;
+  }).join('');
+  renderWiki();
+}
+function toggleEntity(name){
+  if(entities[name]){entities[name].expanded=!entities[name].expanded;renderEntities();}
+}
+
+// ═══════════════════════════════════════
+// RENDER WIKI
+// ═══════════════════════════════════════
+function renderWiki(){
+  const list=document.getElementById('wikiList'),empty=document.getElementById('wikiEmpty');
+  const ww=Object.values(entities).filter(e=>e.wikiData&&e.status!=='gone').sort((a,b)=>b.lastSeen-a.lastSeen).slice(0,6);
+  if(!ww.length){empty.style.display='block';list.innerHTML='';return;}
+  empty.style.display='none';
+  list.innerHTML=ww.map(e=>{
+    const w=e.wikiData;
+    const th=w.thumbnail?`<img class="wc-thumb" src="${w.thumbnail}" alt="${w.title}"/>`:'';
+    return`<div class="wiki-card"><div class="wc-title" onclick="window.open('${w.url}','_blank')">${w.title}</div>${th}<div class="wc-extract">${w.extract}</div><a class="wc-link" href="${w.url}" target="_blank">${w.lang}.wikipedia.org ↗</a></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// PREVIEW WITH HIGHLIGHTING
+// ═══════════════════════════════════════
+function renderPreview(){
+  const text=document.getElementById('editor').value;
+  if(!text){document.getElementById('previewPanel').innerHTML='<div class="wiki-empty">Noch kein Text zum Vorschauen.</div>';return;}
+  let html=escapeHtml(text);
+
+  // Highlight URLs
+  html=html.replace(/(https?:\/\/[^\s<]+)/g,'<span class="hl-link" onclick="window.open(\'$1\',\'_blank\')">$1</span>');
+
+  // Highlight entities
+  const sortedEntities=Object.values(entities).sort((a,b)=>b.name.length-a.name.length);
+  for(const e of sortedEntities){
+    const aliases=KNOWN_ENTITIES[e.name]||[e.name];
+    for(const alias of aliases){
+      const rx=new RegExp('\\b('+escapeRx(escapeHtml(alias))+')\\b','gi');
+      html=html.replace(rx,'<span class="hl-entity" title="Objekt: '+e.name+'">$1</span>');
+    }
+  }
+
+  // Highlight glyph patterns (transformators)
+  const glyphHighlights=[
+    {pattern:PATTERNS.transformation,cls:'hl-transform',label:'Transformation'},
+    {pattern:PATTERNS.aneignung,cls:'hl-aneignung',label:'Aneignung'},
+    {pattern:PATTERNS.erschaffung,cls:'hl-erschaffung',label:'Erschaffung'},
+    {pattern:PATTERNS.aufmerksamkeit,cls:'hl-aufmerksamkeit',label:'Aufmerksamkeit'},
+    {pattern:PATTERNS.stasis,cls:'hl-stasis',label:'Stasis'},
+  ];
+  for(const gh of glyphHighlights){
+    const src=gh.pattern.source;
+    const rx=new RegExp(src,'gi');
+    html=html.replace(rx,(m)=>{
+      if(m.includes('class="hl-'))return m;
+      return'<span class="'+gh.cls+'" title="'+gh.label+'">'+m+'</span>';
+    });
+  }
+
+  // Line breaks
+  html=html.replace(/\n/g,'<br/>');
+
+  // Add concept redundancy legend at top if data exists
+  let legend='';
+  if(lastConceptData&&lastConceptData.thesisCluster){
+    const rd=lastConceptData.redundancyRate;
+    const theses=lastConceptData.thesisCluster.length;
+    const total=lastConceptData.sentences.length;
+    const redundant=total-theses;
+    legend=`<div style="font-size:9px;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px;color:var(--text-dim);line-height:1.8">
+      <b style="color:var(--text);font-weight:400">Konzept-Analyse:</b> 
+      <span style="color:var(--accent)">${theses} einzigartige Thesen</span> · 
+      <span style="color:${rd>0.3?'var(--coral)':'var(--text-dim)'}">${redundant} redundante Sätze (${Math.round(rd*100)}%)</span><br/>
+      <span style="color:var(--accent)">▍</span> = neues Konzept · 
+      <span style="color:var(--coral)">▍</span> = wiederholt früheres Konzept
+    </div>`;
+    
+    // Mark sentences as novel or redundant
+    // Find which sentences are first-in-cluster (novel) vs repeated
+    const novelIndices=new Set(lastConceptData.thesisCluster.map(c=>c[0]));
+    for(let i=0;i<lastConceptData.sentences.length;i++){
+      const sent=lastConceptData.sentences[i];
+      if(sent.length<12)continue;
+      const escaped=escapeHtml(sent.slice(0,40)); // match by prefix to avoid regex issues
+      const safePrefix=escapeRx(escaped);
+      try{
+        const cls=novelIndices.has(i)?'hl-novel':'hl-redundant';
+        const title=novelIndices.has(i)?'Neues Konzept':'Wiederholt früheres Konzept';
+        const rx=new RegExp('('+safePrefix+')','i');
+        html=html.replace(rx,`<span class="${cls}" title="${title}">$1</span>`);
+      }catch(e){}
+    }
+  }
+
+  document.getElementById('previewPanel').innerHTML=legend+html;
+}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ═══════════════════════════════════════
+// GLYPH ANALYSIS
+// ═══════════════════════════════════════
+function analyzeGlyphs(text){
+  const scores={};let total=0;
+  GLYPHS.forEach(g=>{const m=text.match(PATTERNS[g.id])||[];scores[g.id]=m.length;total+=m.length;});
+  let maxId='stasis',maxS=0;
+  GLYPHS.forEach(g=>{if(scores[g.id]>maxS){maxS=scores[g.id];maxId=g.id;}});
+  if(total<2){const ws=text.split(/\s+/);if(ws.reduce((s,w)=>s+w.length,0)/(ws.length||1)>8)maxId='stasis';}
+  GLYPHS.forEach(g=>{
+    const el=document.getElementById('gm-'+g.id);
+    el.className='glyph-mini'+(g.id===maxId?' active':'');
+    el.style.borderColor=g.id===maxId?g.col:'';
+  });
+  if(!glyphHist.length||glyphHist[glyphHist.length-1]!==maxId){glyphHist.push(maxId);if(glyphHist.length>60)glyphHist.shift();}
+  document.getElementById('histRow').innerHTML=glyphHist.map(id=>{
+    const g=GLYPHS.find(x=>x.id===id);return`<div class="hist-dot" style="background:${g?g.col:'#333'}"></div>`;
+  }).join('');
+
+  // Drift detection: same mode for 6+ samples
+  checkDrift();
+}
+
+function checkDrift(){
+  if(glyphHist.length<6)return;
+  const last6=glyphHist.slice(-6);
+  const allSame=last6.every(m=>m===last6[0]);
+  if(allSame&&!driftDismissed){
+    driftCount++;
+    const msgs={
+      aneignung:'Viel Aneignung — vielleicht Zeit, etwas zu setzen?',
+      transformation:'Viel Transformation — bereit für eine eigene Definition?',
+      erschaffung:'Viele Definitionen hintereinander. Braucht der Leser Luft?',
+      aufmerksamkeit:'Dauerhafter Fokus-Modus kann ermüden. Pause?',
+      stasis:'⚠ Stasis erkannt. Kreist du? Kurz stoppen, Energie sammeln.',
+    };
+    document.getElementById('driftMsg').textContent=msgs[last6[0]]||'Gleicher Modus seit einer Weile.';
+    document.getElementById('driftAlert').classList.add('show');
+  }else if(!allSame){
+    driftDismissed=false;
+    document.getElementById('driftAlert').classList.remove('show');
+  }
+}
+
+function dismissDrift(){
+  driftDismissed=true;
+  document.getElementById('driftAlert').classList.remove('show');
+}
+
+// ═══════════════════════════════════════
+// SHANNON WITH BARS
+// ═══════════════════════════════════════
+function analyzeShannon(text){
+  const clean=text.toLowerCase().replace(/\s+/g,'');
+  if(clean.length<3)return;
+  const freq={};for(const c of clean)freq[c]=(freq[c]||0)+1;
+  const len=clean.length;const uniq=Object.keys(freq).length;
+  let H=0;for(const c in freq){const p=freq[c]/len;if(p>0)H-=p*Math.log2(p);}
+  const H0=Math.log2(uniq);const R=H0>0?((1-H/H0)*100):0;
+
+  document.getElementById('shH').textContent=H.toFixed(2);
+  document.getElementById('shH0').textContent=H0.toFixed(2);
+  document.getElementById('shR').textContent=Math.round(R)+'%';
+  document.getElementById('shH').className='sh-val'+(H>H0*0.85?' hl':'');
+  lastShannonR=R; // feed into temperature analysis
+
+  // Character distribution bars
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  const maxF=sorted[0]?sorted[0][1]:1;
+  const bars=document.getElementById('charBars');
+  const labels=document.getElementById('charLabels');
+  bars.innerHTML=sorted.map(([c,f])=>{
+    const h=Math.max(2,Math.round((f/maxF)*38));
+    const hue=Math.round((f/maxF)*120);
+    return`<div class="char-bar" style="height:${h}px;flex:1;background:hsl(${170-hue},50%,40%)"></div>`;
+  }).join('');
+  labels.innerHTML=sorted.map(([c])=>`<div class="char-lbl" style="flex:1">${c}</div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// TEMPERATURE (multi-layer: word entropy + n-gram repetition + Shannon R)
+// ═══════════════════════════════════════
+let lastShannonR=0; // cache from analyzeShannon
+function analyzeTemperature(text){
+  const words=text.toLowerCase().replace(/[.,;:!?*#\-—„""()\[\]]/g,' ').split(/\s+/).filter(w=>w.length>1);
+  if(words.length<8)return;
+
+  // 1. Word-level Shannon entropy (THE key metric for semantic temperature)
+  const wFreq={};
+  for(const w of words)wFreq[w]=(wFreq[w]||0)+1;
+  const wLen=words.length;
+  let Hw=0;
+  for(const w in wFreq){const p=wFreq[w]/wLen;if(p>0)Hw-=p*Math.log2(p);}
+  const Hw0=Math.log2(Object.keys(wFreq).length);
+  const wordRedundancy=Hw0>0?(1-Hw/Hw0):1; // 0=uniform, 1=one word repeated
+
+  // 2. Trigram repetition (catches phrase-level tautology)
+  const trigrams={};let triTotal=0,triRepeated=0;
+  for(let i=0;i<words.length-2;i++){
+    const tri=words[i]+' '+words[i+1]+' '+words[i+2];
+    triTotal++;
+    if(trigrams[tri])triRepeated++;
+    trigrams[tri]=(trigrams[tri]||0)+1;
+  }
+  const triRepRate=triTotal>0?triRepeated/triTotal:0;
+
+  // 3. 4-gram repetition (catches sentence-level repetition)
+  const quads={};let qTotal=0,qRepeated=0;
+  for(let i=0;i<words.length-3;i++){
+    const q=words[i]+' '+words[i+1]+' '+words[i+2]+' '+words[i+3];
+    qTotal++;
+    if(quads[q])qRepeated++;
+    quads[q]=(quads[q]||0)+1;
+  }
+  const qRepRate=qTotal>0?qRepeated/qTotal:0;
+
+  // 4. Unique word ratio (basic but helps)
+  const uniqueRatio=Object.keys(wFreq).length/wLen;
+
+  // 5. Character-level redundancy from Shannon (cross-check)
+  const charR=lastShannonR/100; // 0-1
+
+  // Combine: temperature = 1(hot/new) → 0(cold/redundant)
+  // Word entropy is strongest signal, n-gram repetition catches structure
+  const temp=Math.min(1,Math.max(0,
+    (1-wordRedundancy)*0.30 +    // word diversity
+    (1-triRepRate)*0.25 +        // phrase novelty
+    (1-qRepRate)*0.15 +          // sentence novelty
+    uniqueRatio*0.15 +           // lexical range
+    (1-charR)*0.15               // character entropy
+  ));
+
+  const fill=document.getElementById('tempFill'),val=document.getElementById('tempVal');
+  fill.style.height=(temp*100)+'%';
+  
+  // More granular labels
+  if(temp>.75){fill.style.background='var(--gold)';val.textContent='heiß';val.className='temp-val hot';}
+  else if(temp>.55){fill.style.background='var(--gold)';val.textContent='warm';val.className='temp-val';}
+  else if(temp>.4){fill.style.background='var(--text-dim)';val.textContent='lauwarm';val.className='temp-val';}
+  else if(temp>.25){fill.style.background='var(--blue)';val.textContent='kühl';val.className='temp-val cold';}
+  else{fill.style.background='var(--blue)';val.textContent='kalt';val.className='temp-val cold';}
+
+  // Update label with detail
+  document.getElementById('tempLbl').textContent=
+    'W-Entropie:'+(1-wordRedundancy).toFixed(2)+' Tri:'+((1-triRepRate).toFixed(2))+' Q:'+((1-qRepRate).toFixed(2));
+}
+
+// ═══════════════════════════════════════
+// RHETORIC (strip markdown, show values)
+// ═══════════════════════════════════════
+function analyzeRhetoric(text){
+  // Strip markdown formatting that breaks regex
+  const clean=text.replace(/[*#_~`>\-|=\[\](){}]/g,' ').replace(/\s+/g,' ');
+  
+  const istPatterns=/\b(ist|sind|es\s+gibt|war|waren|gibt\s+es|existiert|besteht|befindet|liegt|aktuell|derzeit|momentan|gegenwärtig|situation|zustand|problem|herausforderung|schwierigkeit|entspricht|verbleibt|bleibt|weiterhin|bereits|bisher|keine\s+änderung|bestätigt|basieren|basiert|bestimmt|wiederhol|bekannt|ergibt|liefert|vorliegen|eintritt|erwartete|fortführung|ablauf|abgelaufen|protokoll)\b/gi;
+  const trfPatterns=/\b(sollte|könnte|müsste|wäre|würde|vorschlag|lösung|alternative|stattdessen|besser\s+wäre|man\s+könnte|idee|ansatz|strategie|zukunft|veränderung|wandel|entwicklung|verbessern|optimieren|umgestalten|reformieren|erneuern|gestalten|aufbauen|schaffen|ermöglichen|einführen|vision|ziel|chance|potenzial|möglichkeit|innovation|fortschritt|nächster\s+schritt)\b/gi;
+  
+  const istMatches=clean.match(istPatterns)||[];
+  const trfMatches=clean.match(trfPatterns)||[];
+  const istCount=istMatches.length;
+  const trfCount=trfMatches.length;
+  const total=istCount+trfCount;
+  
+  // Update value displays
+  document.getElementById('rhetIST').textContent=istCount;
+  document.getElementById('rhetTRF').textContent=trfCount;
+  
+  if(total===0){
+    document.getElementById('rhetRatio').textContent='—';
+    document.getElementById('rhetState').textContent='Zu wenig Signal';
+    return;
+  }
+  
+  const ratio=trfCount/total;
+  document.getElementById('rhetRatio').textContent=(ratio*100).toFixed(0)+'%';
+  
+  const fill=document.getElementById('rhetFill'),state=document.getElementById('rhetState');
+  fill.style.width=(ratio*100)+'%';
+  
+  if(ratio<.2){fill.style.background='var(--coral)';state.textContent='Stark beschreibend (IST-Zustand)';}
+  else if(ratio<.4){fill.style.background='var(--coral)';state.textContent='Überwiegend IST';}
+  else if(ratio<.6){fill.style.background='var(--gold)';state.textContent='Übergang — Brücke wird gebaut';}
+  else if(ratio<.8){fill.style.background='var(--accent)';state.textContent='Überwiegend Transform';}
+  else{fill.style.background='var(--accent)';state.textContent='Stark transformierend';}
+}
+
+// ═══════════════════════════════════════
+// CONCEPT REDUNDANCY (semantic sentence-level)
+// ═══════════════════════════════════════
+const DE_STOPWORDS=new Set('der die das ein eine und oder aber wenn weil dass nach vor bei mit für über unter durch gegen ohne zwischen hier dort dann also denn noch schon auch nur nicht sehr viel mehr mein dein sein ihr wie was wer diese dieser dieses jetzt heute morgen immer alle alles andere ganz neue neuen guten ersten einige viele wenige manche es ist sind war waren wird werden hat haben kann können soll sollen muss müssen auf aus an in von zu dem den des einem einer eines er sie ihm ihr uns wir man sich so da wo ob zum zur am im vom ans ins'.split(' '));
+
+function getContentWords(sentence){
+  return sentence.toLowerCase()
+    .replace(/[.,;:!?*#\-—„""()\[\]{}0-9]/g,' ')
+    .split(/\s+/)
+    .filter(w=>w.length>2&&!DE_STOPWORDS.has(w));
+}
+
+function jaccard(setA,setB){
+  if(!setA.size||!setB.size)return 0;
+  let intersection=0;
+  for(const w of setA)if(setB.has(w))intersection++;
+  return intersection/(setA.size+setB.size-intersection);
+}
+
+let lastConceptData=null; // for preview highlighting
+
+function analyzeConceptRedundancy(text){
+  const clean=text.replace(/[*#_~`>\-|=\[\](){}]/g,' ');
+  // Split into sentences
+  const sentences=clean.split(/[.!?]+/).map(s=>s.trim()).filter(s=>s.length>10);
+  if(sentences.length<2){
+    document.getElementById('crScore').textContent='—';
+    document.getElementById('crTheses').textContent='—';
+    document.getElementById('crNovelty').textContent='—';
+    document.getElementById('crBar').style.width='0';
+    lastConceptData=null;
+    return;
+  }
+
+  // Extract content word sets per sentence
+  const sentenceSets=sentences.map(s=>new Set(getContentWords(s)));
+  
+  // Find unique theses: cluster sentences by similarity
+  const thesisCluster=[]; // array of arrays of sentence indices
+  const assigned=new Set();
+  
+  for(let i=0;i<sentenceSets.length;i++){
+    if(assigned.has(i))continue;
+    const cluster=[i];
+    assigned.add(i);
+    for(let j=i+1;j<sentenceSets.length;j++){
+      if(assigned.has(j))continue;
+      const sim=jaccard(sentenceSets[i],sentenceSets[j]);
+      if(sim>0.35){ // >35% word overlap = same concept
+        cluster.push(j);
+        assigned.add(j);
+      }
+    }
+    thesisCluster.push(cluster);
+  }
+  
+  const uniqueTheses=thesisCluster.length;
+  const totalSentences=sentences.length;
+  
+  // Calculate redundancy: how many sentences repeat existing concepts
+  let redundantSentences=0;
+  for(const cluster of thesisCluster){
+    if(cluster.length>1)redundantSentences+=(cluster.length-1);
+  }
+  const redundancyRate=redundantSentences/totalSentences;
+  const noveltyRate=1-redundancyRate;
+  
+  // Novelty per paragraph: split by double newline or long gaps
+  const paragraphs=text.split(/\n\s*\n/).filter(p=>p.trim().length>10);
+  let novelPerParagraph='—';
+  if(paragraphs.length>1){
+    // How many paragraphs introduce at least one new concept
+    let novelParagraphs=0;
+    const seenWords=new Set();
+    for(const p of paragraphs){
+      const pWords=getContentWords(p);
+      const newWords=pWords.filter(w=>!seenWords.has(w));
+      if(newWords.length>pWords.length*0.2)novelParagraphs++; // >20% new words = novel paragraph
+      pWords.forEach(w=>seenWords.add(w));
+    }
+    novelPerParagraph=novelParagraphs+'/'+paragraphs.length;
+  }
+  
+  // Store for preview highlighting
+  lastConceptData={sentences,sentenceSets,thesisCluster,redundancyRate};
+  
+  // Update UI
+  const scoreLabel=redundancyRate<0.15?'dicht':redundancyRate<0.35?'ok':redundancyRate<0.55?'redundant':'sehr redundant';
+  document.getElementById('crScore').textContent=Math.round(redundancyRate*100)+'%';
+  document.getElementById('crScore').style.color=
+    redundancyRate<0.15?'var(--accent)':redundancyRate<0.35?'var(--text-dim)':redundancyRate<0.55?'var(--gold)':'var(--coral)';
+  document.getElementById('crTheses').textContent=uniqueTheses+' von '+totalSentences+' Sätzen';
+  document.getElementById('crNovelty').textContent=novelPerParagraph;
+  
+  const bar=document.getElementById('crBar');
+  bar.style.width=(noveltyRate*100)+'%';
+  bar.style.background=noveltyRate>0.7?'var(--accent)':noveltyRate>0.5?'var(--gold)':'var(--coral)';
+}
+
+// ═══════════════════════════════════════
+// SAVE / JOURNAL
+// ═══════════════════════════════════════
+function getSnapshot(){
+  const text=document.getElementById('editor').value;
+  const w500=text.slice(-500);
+  // Shannon
+  const clean=w500.toLowerCase().replace(/\s+/g,'');
+  let H=0,H0=0,R=0;
+  if(clean.length>2){
+    const freq={};for(const c of clean)freq[c]=(freq[c]||0)+1;
+    const len=clean.length;const uniq=Object.keys(freq).length;
+    for(const c in freq){const p=freq[c]/len;if(p>0)H-=p*Math.log2(p);}
+    H0=Math.log2(uniq);R=H0>0?((1-H/H0)*100):0;
+  }
+  // Glyph scores
+  const gScores={};
+  GLYPHS.forEach(g=>{gScores[g.id]=(w500.match(PATTERNS[g.id])||[]).length;});
+  let dominant='stasis',maxS=0;
+  GLYPHS.forEach(g=>{if(gScores[g.id]>maxS){maxS=gScores[g.id];dominant=g.id;}});
+  // Rhetoric
+  const ist=(w500.match(/\b(ist|sind|war|waren|gibt\s+es|existiert|besteht|aktuell|derzeit|situation|zustand|problem)\b/gi)||[]).length;
+  const tr=(w500.match(/\b(sollte|könnte|müsste|vorschlag|lösung|alternative|stattdessen|idee|ansatz|strategie|zukunft|verbessern)\b/gi)||[]).length;
+  const rhetRatio=(ist+tr)>0?tr/(ist+tr):0.5;
+  // Temperature
+  const words=w500.split(/\s+/);
+  const ur=words.length>0?new Set(words.map(w=>w.toLowerCase())).size/words.length:0;
+
+  return{
+    entropy:+H.toFixed(3),maxEntropy:+H0.toFixed(3),redundancy:+R.toFixed(1),
+    dominant,glyphScores:gScores,rhetRatio:+rhetRatio.toFixed(2),
+    uniqueRatio:+ur.toFixed(2),wordCount:text.trim().split(/\s+/).filter(Boolean).length,
+    objects:Object.keys(entities),
+    conceptRedundancy:lastConceptData?+(lastConceptData.redundancyRate).toFixed(2):null,
+    uniqueTheses:lastConceptData?lastConceptData.thesisCluster.length:null,
+  };
+}
+
+function saveEntry(){
+  const text=document.getElementById('editor').value.trim();
+  if(!text){document.getElementById('saveStatus').textContent='Nichts zu speichern.';return;}
+  const title=document.getElementById('entryTitle').value.trim()||'Ohne Titel';
+  const snap=getSnapshot();
+  const entry={
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    title,text,
+    date:new Date().toISOString(),
+    stats:snap,
+  };
+  journal.unshift(entry);
+  saveJournal();
+  document.getElementById('saveStatus').textContent='✓ Gespeichert — '+new Date().toLocaleTimeString('de-DE');
+  setTimeout(()=>document.getElementById('saveStatus').textContent='',3000);
+}
+
+function saveJournal(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(journal));}catch(e){console.warn('Storage full');}
+}
+function loadJournal(){
+  try{const d=localStorage.getItem(STORE_KEY);if(d)journal=JSON.parse(d);}catch(e){}
+}
+
+// ═══════════════════════════════════════
+// JOURNAL VIEW
+// ═══════════════════════════════════════
+function renderJournal(){
+  const list=document.getElementById('journalList');
+  const empty=document.getElementById('jEmpty');
+  const evo=document.getElementById('jEvolution');
+  
+  if(!journal.length){empty.style.display='block';evo.style.display='none';list.innerHTML='';return;}
+  empty.style.display='none';
+
+  // Evolution chart (entropy over time)
+  if(journal.length>1){
+    evo.style.display='block';
+    const chart=document.getElementById('jEvoChart');
+    const entries=journal.slice().reverse().slice(-40);
+    const maxH=Math.max(...entries.map(e=>e.stats?.entropy||0),1);
+    chart.innerHTML=entries.map(e=>{
+      const h=e.stats?.entropy||0;
+      const barH=Math.max(3,Math.round((h/maxH)*55));
+      const g=GLYPHS.find(x=>x.id===(e.stats?.dominant||'stasis'));
+      const col=g?g.col:'#333';
+      const d=new Date(e.date);
+      const tip=d.getDate()+'.'+(d.getMonth()+1)+' — H:'+h.toFixed(2)+' — '+e.title;
+      return`<div class="j-evo-bar" style="height:${barH}px;flex:1;background:${col}" data-tip="${tip}" onclick="loadEntry('${e.id}')"></div>`;
+    }).join('');
+  }else{evo.style.display='none';}
+
+  // Entries
+  list.innerHTML=journal.map(e=>{
+    const d=new Date(e.date);
+    const dateStr=d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const preview=e.text.slice(0,120)+(e.text.length>120?'…':'');
+    const tags=(e.stats?.objects||[]).slice(0,5).map(o=>`<span class="j-entry-tag">${o}</span>`).join('');
+    const g=GLYPHS.find(x=>x.id===(e.stats?.dominant||'stasis'));
+    const rhet=e.stats?.rhetRatio||0;
+    const rhetLabel=rhet<.3?'IST':rhet<.6?'Übergang':'Transform';
+    
+    // Find related entries (shared objects)
+    const myObjs=new Set(e.stats?.objects||[]);
+    const related=journal.filter(o=>o.id!==e.id&&(o.stats?.objects||[]).some(ob=>myObjs.has(ob))).slice(0,3);
+    const relatedHtml=related.length?`<div class="j-related"><div class="j-related-title">Verbundene Einträge:</div>${related.map(r=>`<div class="j-related-item" onclick="loadEntry('${r.id}')">${r.title} — ${new Date(r.date).toLocaleDateString('de-DE')}</div>`).join('')}</div>`:'';
+
+    return`<div class="j-entry" onclick="loadEntry('${e.id}')">
+      <div class="j-entry-title">${escapeHtml(e.title)}</div>
+      <div class="j-entry-date">${dateStr}</div>
+      <div class="j-entry-preview">${escapeHtml(preview)}</div>
+      <div class="j-entry-tags">${tags}</div>
+      <div class="j-entry-stats">
+        <span class="j-stat">H: <b>${(e.stats?.entropy||0).toFixed(2)}</b></span>
+        <span class="j-stat">R: <b>${(e.stats?.redundancy||0).toFixed(0)}%</b></span>
+        <span class="j-stat">Modus: <b style="color:${g?g.col:'#666'}">${g?g.lbl:'—'}</b></span>
+        <span class="j-stat">Rhetorik: <b>${rhetLabel}</b></span>
+        <span class="j-stat">Wörter: <b>${e.stats?.wordCount||0}</b></span>
+        <span class="j-stat">Konzept-R: <b style="color:${(e.stats?.conceptRedundancy||0)>0.35?'var(--coral)':'var(--accent)'}">${e.stats?.conceptRedundancy!=null?Math.round(e.stats.conceptRedundancy*100)+'%':'—'}</b></span>
+        <span class="j-stat">Thesen: <b>${e.stats?.uniqueTheses||'—'}</b></span>
+      </div>
+      ${relatedHtml}
+    </div>`;
+  }).join('');
+}
+
+function loadEntry(id){
+  const e=journal.find(x=>x.id===id);
+  if(!e)return;
+  document.getElementById('editor').value=e.text;
+  document.getElementById('entryTitle').value=e.title;
+  switchView('write');
+  // Trigger re-analysis
+  lastText='';entities={};glyphHist=[];
+  onInput();
+}
+
+function deleteEntry(id){
+  journal=journal.filter(e=>e.id!==id);
+  saveJournal();
+  renderJournal();
+}
+
+// ── Boot ──
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

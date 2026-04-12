@@ -1,7 +1,7 @@
 {
   "name": "deinestimme",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,9 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/crimson-pro": "^5.2.8",
+    "@fontsource/dm-mono": "^5.2.7",
+    "@supabase/supabase-js": "^2.39.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@supabase/supabase-js": "^2.39.0"
+    "react-router-dom": "^7.14.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

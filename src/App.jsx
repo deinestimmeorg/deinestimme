@@ -2,6 +2,10 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import WelcomeScreen from "./components/WelcomeScreen";
 import ProposalComposer from "./components/ProposalComposer";
 import LivePulse from "./components/LivePulse";
+import PersonalDashboard from "./components/PersonalDashboard";
+import SchreibkompassTool from "./components/SchreibkompassTool";
+import VertragsanalyseTool from "./components/VertragsanalyseTool";
+import InviteGate from "./components/InviteGate";
 import { supabase } from "./supabaseClient";
 import { T } from "./tokens";
 import { TOPICS, LEITPRINZIPIEN, TIMELINE, WIRTSCHAFT_BEISPIELE, INFRASTRUKTUR_SOUVERAENITAET } from "./content";
@@ -298,16 +302,19 @@ export default function DeineStimmeApp() {
   };
 
   const tabs = [
-    { id: "themen", label: "Themen" },
-    { id: "vorschlag", label: "Vorschlag einreichen" },
-    { id: "impact", label: "Wirkungsanalyse" },
-    { id: "timeline", label: "Fahrplan" },
-    { id: "build", label: "Mitbauen" },
-    { id: "needs", label: "Was wir brauchen" },
+    { id: "themen", label: "Themen", group: "plattform" },
+    { id: "vorschlag", label: "Vorschlag einreichen", group: "plattform" },
+    { id: "impact", label: "Wirkungsanalyse", group: "plattform" },
+    { id: "dashboard", label: "Mein Bereich", group: "plattform" },
+    { id: "timeline", label: "Fahrplan", group: "plattform" },
+    { id: "build", label: "Mitbauen", group: "plattform" },
+    { id: "needs", label: "Was wir brauchen", group: "plattform" },
+    { id: "schreibkompass", label: "Schreibkompass", group: "werkzeuge" },
+    { id: "vertragsanalyse", label: "Vertragsanalyse", group: "werkzeuge" },
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: T.bg, color: T.text, fontFamily: T.sans, padding: "20px 14px", maxWidth: 720, margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", background: T.bg, color: T.text, fontFamily: T.sans, padding: "20px 14px", maxWidth: view === "schreibkompass" ? 1100 : 720, margin: "0 auto", transition: "max-width 0.3s" }}>
       {/* Header */}
       <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
@@ -316,7 +323,7 @@ export default function DeineStimmeApp() {
             <span style={{ fontFamily: T.mono, fontSize: 20, fontWeight: 700, color: T.text }}>stimme</span>
             <span style={{ fontFamily: T.mono, fontSize: 10, color: T.textDim }}>.org</span>
           </div>
-          <p style={{ color: T.textMuted, fontSize: 11, fontFamily: T.mono, margin: "2px 0 0" }}>v0.4 — schreibassistent + schwarm</p>
+          <p style={{ color: T.textMuted, fontSize: 11, fontFamily: T.mono, margin: "2px 0 0" }}>v0.5 — plattform + werkzeuge</p>
         </div>
 
         <div style={{ textAlign: "right" }}>
@@ -325,6 +332,14 @@ export default function DeineStimmeApp() {
           </span>
           <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: "2px 0 0" }}>
             {currentUser.is_permanent ? "Pionier" : "Flüchtig"}
+            <span onClick={() => {
+              localStorage.removeItem('deinestimme_user_id');
+              localStorage.removeItem('deinestimme_name');
+              sessionStorage.removeItem('deinestimme_user_id');
+              sessionStorage.removeItem('deinestimme_name');
+              sessionStorage.removeItem('ds_auth');
+              setCurrentUser(null);
+            }} style={{ marginLeft: 8, color: T.textDim, cursor: "pointer", textDecoration: "underline" }}>abmelden</span>
           </p>
         </div>
       </div>
@@ -335,20 +350,36 @@ export default function DeineStimmeApp() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20, flexWrap: "wrap" }}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={() => { setView(t.id); if (t.id === "vorschlag") setComposerOpen(true); }} style={{
-            background: view === t.id ? T.surfaceActive : "transparent",
-            border: `1px solid ${view === t.id ? T.borderHover : "transparent"}`,
-            borderRadius: T.r, padding: "7px 14px",
-            color: view === t.id ? (t.id === "vorschlag" ? T.accent : T.text) : T.textMuted,
-            fontSize: 12, fontFamily: T.mono, cursor: "pointer",
-            fontWeight: view === t.id ? 600 : 400,
-          }}>{t.label}</button>
-        ))}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}>
+          {tabs.filter(t => t.group === "plattform").map(t => (
+            <button key={t.id} onClick={() => { setView(t.id); if (t.id === "vorschlag") setComposerOpen(true); }} style={{
+              background: view === t.id ? T.surfaceActive : "transparent",
+              border: `1px solid ${view === t.id ? T.borderHover : "transparent"}`,
+              borderRadius: T.r, padding: "7px 14px",
+              color: view === t.id ? (t.id === "vorschlag" ? T.accent : T.text) : T.textMuted,
+              fontSize: 12, fontFamily: T.mono, cursor: "pointer",
+              fontWeight: view === t.id ? 600 : 400,
+            }}>{t.label}</button>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          <span style={{ color: T.textDim, fontSize: 9, fontFamily: T.mono, marginRight: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>werkzeuge</span>
+          {tabs.filter(t => t.group === "werkzeuge").map(t => (
+            <button key={t.id} onClick={() => setView(t.id)} style={{
+              background: view === t.id ? T.accentDim : "transparent",
+              border: `1px solid ${view === t.id ? T.accent + "44" : "transparent"}`,
+              borderRadius: T.r, padding: "6px 12px",
+              color: view === t.id ? T.accent : T.textMuted,
+              fontSize: 11, fontFamily: T.mono, cursor: "pointer",
+              fontWeight: view === t.id ? 600 : 400,
+            }}>{t.label}</button>
+          ))}
+        </div>
       </div>
 
-      {/* ═══ LEITPRINZIPIEN (always visible) ═══ */}
+      {/* ═══ LEITPRINZIPIEN (visible for plattform views) ═══ */}
+      {!["schreibkompass", "vertragsanalyse"].includes(view) && (
       <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
         {LEITPRINZIPIEN.map(lp => (
           <div key={lp.id} style={{
@@ -360,6 +391,7 @@ export default function DeineStimmeApp() {
           </div>
         ))}
       </div>
+      )}
 
       {/* ═══ THEMEN VIEW ═══ */}
       {view === "themen" && (
@@ -659,10 +691,29 @@ export default function DeineStimmeApp() {
         </div>
       )}
 
+      {/* ═══ DASHBOARD VIEW ═══ */}
+      {view === "dashboard" && (
+        <PersonalDashboard user={currentUser} />
+      )}
+
+      {/* ═══ SCHREIBKOMPASS ═══ */}
+      {view === "schreibkompass" && (
+        <InviteGate scope="schreibkompass">
+          <SchreibkompassTool />
+        </InviteGate>
+      )}
+
+      {/* ═══ VERTRAGSANALYSE ═══ */}
+      {view === "vertragsanalyse" && (
+        <InviteGate scope="vertragsanalyse">
+          <VertragsanalyseTool />
+        </InviteGate>
+      )}
+
       {/* Footer */}
       <div style={{ marginTop: 40, padding: "16px 0", borderTop: `1px solid ${T.border}`, textAlign: "center" }}>
         <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: 0 }}>die würde des menschen als oberstes gebot — alles weitere lässt sich daraus ableiten</p>
-        <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: "4px 0 0" }}>deinestimme.org — prototyp v0.4</p>
+        <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: "4px 0 0" }}>deinestimme.org — prototyp v0.5 — testversion</p>
       </div>
     </div>
   );
