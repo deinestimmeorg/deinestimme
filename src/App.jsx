@@ -1,11 +1,10 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import WelcomeScreen from "./components/WelcomeScreen";
 import ProposalComposer from "./components/ProposalComposer";
 import LivePulse from "./components/LivePulse";
 import PersonalDashboard from "./components/PersonalDashboard";
 import SchreibkompassTool from "./components/SchreibkompassTool";
 import VertragsanalyseTool from "./components/VertragsanalyseTool";
-import InviteGate from "./components/InviteGate";
 import { supabase } from "./supabaseClient";
 import { T } from "./tokens";
 import { TOPICS, LEITPRINZIPIEN, TIMELINE, WIRTSCHAFT_BEISPIELE, INFRASTRUKTUR_SOUVERAENITAET } from "./content";
@@ -277,8 +276,8 @@ export default function DeineStimmeApp() {
   useEffect(() => {
     const channel = supabase
       .channel('public:proposals')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'proposals' }, payload => {
-        console.log('Neuer Vorschlag eingetroffen!', payload.new);
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'proposals' }, () => {
+        // TODO: Update local proposal list on realtime insert
       })
       .subscribe();
 
@@ -295,8 +294,7 @@ export default function DeineStimmeApp() {
     setMitigationText("");
   };
 
-  const handleProposalSubmit = (proposal) => {
-    console.log("Proposal submitted:", proposal);
+  const handleProposalSubmit = () => {
     // TODO: Insert into Supabase
     setTimeout(() => setComposerOpen(false), 2000);
   };

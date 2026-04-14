@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { T } from "../tokens";
 
 // ─── Spracherkennung: IST-Zustand vs. Lösungsvorschlag ───

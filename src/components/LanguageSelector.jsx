@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { T } from "../tokens";
 
 const LANGUAGES = [

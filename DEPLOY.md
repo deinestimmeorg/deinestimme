@@ -4,6 +4,9 @@
 
 ```
 /                → Landingpage (öffentlich, kein Passwort)
+/verstehen       → Wie DeineStimme funktioniert
+/mitbauen        → Mitmachen & Open Source
+/institution     → Für Institutionen & Pilotprojekte
 /app             → Plattform (Sprache → Passwort → App)
 ```
 
@@ -11,16 +14,28 @@
 
 ```bash
 npm install
+cp .env.example .env.local   # Supabase-Keys eintragen
 npm run dev
+```
+
+## Umgebungsvariablen
+
+```
+VITE_SUPABASE_URL=https://...supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_...
 ```
 
 ## Dateien
 
 ```
 src/
-  main.jsx                    — Router: / = Landing, /app = Plattform
-  pages/LandingPage.jsx       — Landingpage mit Manifest + Audio + Türen
-  App.jsx                     — Bestehende Plattform
+  main.jsx                    — Router: /, /verstehen, /mitbauen, /institution, /app
+  pages/
+    LandingPage.jsx           — Landingpage mit Manifest + Audio + 4 Türen
+    VerstehenPage.jsx         — Erklärseite (Module, Ablauf, Open Source)
+    MitbauenPage.jsx          — Mitmach-Seite (Beitragen, Stack, GitHub)
+    InstitutionPage.jsx       — Institutionenseite (Use Cases, Pilotprojekt)
+  App.jsx                     — Bestehende Plattform (/app)
   components/                 — PasswordGate, WelcomeScreen, etc.
   tokens.js                   — Design Tokens
   content.js                  — Topics, Leitprinzipien, etc.
