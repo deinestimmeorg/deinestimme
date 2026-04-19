@@ -41,7 +41,7 @@ const CONTENT = {
     about: "Über die Engine",
     aboutBody: "Hybride Zuordnung nach Grundgesetz (GG) + AEUV/TFEU + LeiKa/FIM + EuroVoc. Confidence-Formel 60/20/15/5: 60% Rechtsgrundlagen-Treffer, 20% Subsidiaritäts-Test (Oates: Spillover/Skaleneffekte/Präferenzheterogenität), 15% Präzedenz/Praxis, 5% Residualregel. Phase-1-Release v0.1, kuratierte Seed-Daten.",
     spec: "Spec v0.3",
-    contact: "Strauss & Reinemann GbR",
+    contact: "Strauß & Reinemann GbR",
     langSwitch: "EN",
   },
   en: {
@@ -68,7 +68,7 @@ const CONTENT = {
     about: "About the engine",
     aboutBody: "Hybrid classification based on Grundgesetz (GG) + TFEU + LeiKa/FIM + EuroVoc. Confidence formula 60/20/15/5: 60% legal-basis match, 20% subsidiarity (Oates: spillover/economies of scale/preference heterogeneity), 15% precedent, 5% residual rule. Phase-1 release v0.1, curated seed data.",
     spec: "Spec v0.3",
-    contact: "Strauss & Reinemann GbR",
+    contact: "Strauß & Reinemann GbR",
     langSwitch: "DE",
   },
 };

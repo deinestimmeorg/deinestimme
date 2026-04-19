@@ -3,7 +3,7 @@
 **Politische Zuständigkeitszuordnung — Open-Source npm-Modul**
 Thema → Gemeinde / Kreis / Land / Bund / EU mit Confidence, Evidence und Explanation.
 
-Hybride Architektur: **LeiKa/FIM + GG-Regelwerk + EUR-Lex/CELLAR + EuroVoc** — aufgebaut nach der technischen Spezifikation v0.3 (Strauss & Reinemann GbR, 14. April 2026).
+Hybride Architektur: **LeiKa/FIM + GG-Regelwerk + EUR-Lex/CELLAR + EuroVoc** — aufgebaut nach der technischen Spezifikation v0.3 (Strauß & Reinemann GbR, 14. April 2026).
 
 License: **AGPL-3.0-or-later**
 
