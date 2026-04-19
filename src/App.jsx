@@ -5,9 +5,19 @@ import LivePulse from "./components/LivePulse";
 import PersonalDashboard from "./components/PersonalDashboard";
 import SchreibkompassTool from "./components/SchreibkompassTool";
 import VertragsanalyseTool from "./components/VertragsanalyseTool";
+import ZustaendigkeitInline from "./components/ZustaendigkeitInline";
+import { useTranslation } from "./components/LanguageSelector";
+import { getZustT, EXAMPLE_QUERIES } from "./zustaendigkeitI18n";
 import { supabase } from "./supabaseClient";
 import { T } from "./tokens";
-import { TOPICS, LEITPRINZIPIEN, TIMELINE, WIRTSCHAFT_BEISPIELE, INFRASTRUKTUR_SOUVERAENITAET } from "./content";
+import { TOPICS, LEITPRINZIPIEN, WIRTSCHAFT_BEISPIELE, INFRASTRUKTUR_SOUVERAENITAET } from "./content";
+import {
+  THEMEN,
+  THEMEN_SOURCES,
+  themenByCountry,
+  themaAsComposerSeed,
+  getThemenT,
+} from "./themenbeispiele";
 
 function Badge({ children, color = T.accent, bg = T.accentDim }) {
   return <span style={{ fontSize: 10, fontWeight: 600, fontFamily: T.mono, color, background: bg, padding: "2px 7px", borderRadius: "4px", letterSpacing: "0.03em", textTransform: "uppercase" }}>{children}</span>;
@@ -257,6 +267,13 @@ export default function DeineStimmeApp() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [mitigationTarget, setMitigationTarget] = useState(null);
   const [mitigationText, setMitigationText] = useState("");
+  const [zustQuery, setZustQuery] = useState("");
+  const [themenCountry, setThemenCountry] = useState("DE");
+  const [expandedThema, setExpandedThema] = useState(null);
+  const [composerSeed, setComposerSeed] = useState("");
+  const { lang } = useTranslation();
+  const zt = getZustT(lang);
+  const tht = getThemenT(lang);
 
   // Check for returning user
   useEffect(() => {
@@ -272,8 +289,9 @@ export default function DeineStimmeApp() {
     }
   }, []);
 
-  // Realtime subscription
+  // Realtime subscription (guarded — supabase may be null if env vars missing)
   useEffect(() => {
+    if (!supabase) return;
     const channel = supabase
       .channel('public:proposals')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'proposals' }, () => {
@@ -304,9 +322,9 @@ export default function DeineStimmeApp() {
     { id: "vorschlag", label: "Vorschlag einreichen", group: "plattform" },
     { id: "impact", label: "Wirkungsanalyse", group: "plattform" },
     { id: "dashboard", label: "Mein Bereich", group: "plattform" },
-    { id: "timeline", label: "Fahrplan", group: "plattform" },
     { id: "build", label: "Mitbauen", group: "plattform" },
     { id: "needs", label: "Was wir brauchen", group: "plattform" },
+    { id: "zustaendigkeit", label: zt.tabLabel, group: "werkzeuge" },
     { id: "schreibkompass", label: "Schreibkompass", group: "werkzeuge" },
     { id: "vertragsanalyse", label: "Vertragsanalyse", group: "werkzeuge" },
   ];
@@ -338,6 +356,13 @@ export default function DeineStimmeApp() {
               sessionStorage.removeItem('ds_auth');
               setCurrentUser(null);
             }} style={{ marginLeft: 8, color: T.textDim, cursor: "pointer", textDecoration: "underline" }}>abmelden</span>
+            <span
+              onClick={() => { localStorage.removeItem('ds_lang'); window.location.reload(); }}
+              title="Sprache / Language / Taal / Langue / Idioma"
+              style={{ marginLeft: 8, color: T.textDim, cursor: "pointer", textDecoration: "underline" }}
+            >
+              🌐 {lang.toUpperCase()}
+            </span>
           </p>
         </div>
       </div>
@@ -471,55 +496,201 @@ export default function DeineStimmeApp() {
               })}
             </div>
           </div>
-        </div>
-      )}
 
-      {/* ═══ TIMELINE VIEW ═══ */}
-      {view === "timeline" && (
-        <div>
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ color: T.silver, fontSize: 13, fontFamily: T.sans, lineHeight: 1.6, margin: 0 }}>
-              Wir kommen um zu gehen. Dieser Plan ist der Weg — von der Vereinsgründung bis zur Überflüssigkeit.
-            </p>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {TIMELINE.map((phase, i) => {
-              const statusColors = { aktiv: T.accent, geplant: T.gold, vision: T.purple };
-              return (
-                <div key={phase.phase} style={{
-                  background: T.surface, border: `1px solid ${phase.status === "aktiv" ? T.accent + "33" : T.border}`,
-                  borderRadius: T.rl, padding: "16px", position: "relative",
-                  borderLeft: `3px solid ${statusColors[phase.status]}`,
+          {/* ═══ TOP-PROBLEME (DE/NL/FR, April 2026) — v0.4 ═══ */}
+          <div style={{ marginTop: 20 }}>
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              marginBottom: 8, flexWrap: "wrap", gap: 8,
+            }}>
+              <div>
+                <span style={{ color: T.silver, fontSize: 11, fontFamily: T.mono, fontWeight: 600, textTransform: "uppercase" }}>
+                  {tht.sectionTitle}
+                </span>
+                <span style={{
+                  marginLeft: 8, fontSize: 9, fontFamily: T.mono, color: T.purple,
+                  background: T.purple + "22", padding: "2px 6px", borderRadius: T.r,
+                  fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase",
                 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ color: statusColors[phase.status], fontSize: 24, fontFamily: T.mono, fontWeight: 700, opacity: 0.4 }}>{phase.phase}</span>
-                      <div>
-                        <span style={{ color: T.text, fontSize: 15, fontWeight: 600, fontFamily: T.sans }}>{phase.title}</span>
-                        <span style={{ color: T.textMuted, fontSize: 11, fontFamily: T.mono, display: "block" }}>{phase.zeitraum}</span>
-                      </div>
+                  {tht.testBadge}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: 4 }}>
+                {["DE", "NL", "FR"].map(c => (
+                  <button
+                    key={c}
+                    onClick={() => setThemenCountry(c)}
+                    style={{
+                      background: themenCountry === c ? T.accent + "22" : "transparent",
+                      border: `1px solid ${themenCountry === c ? T.accent : T.border}`,
+                      color: themenCountry === c ? T.accent : T.textMuted,
+                      fontSize: 11, fontFamily: T.mono, fontWeight: 600,
+                      padding: "4px 10px", borderRadius: T.r, cursor: "pointer",
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {tht.countryLabel[c]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <p style={{ color: T.textMuted, fontSize: 11, fontFamily: T.sans, lineHeight: 1.5, margin: "0 0 12px" }}>
+              {tht.sectionSub}
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {themenByCountry(themenCountry).map(thema => {
+                const zHint = thema.zust_hint || {};
+                const levelColor = {
+                  EU: "#9B7BD4", Bund: "#4A90D9", Land: "#C4A35A",
+                  Kreis: "#D98B5C", Kommune: "#3DBB7D",
+                }[zHint.primary_level] || T.silver;
+                const isOpen = expandedThema === thema.id;
+                const isFull = thema.detail_level === "full";
+                return (
+                  <div
+                    key={thema.id}
+                    style={{
+                      background: T.surface, border: `1px solid ${T.border}`,
+                      borderRadius: T.rl, padding: "12px 14px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <span style={{
+                        color: T.textMuted, fontSize: 10, fontFamily: T.mono,
+                        fontWeight: 700, minWidth: 22,
+                      }}>
+                        #{String(thema.rank).padStart(2, "0")}
+                      </span>
+                      <span style={{ color: T.text, fontSize: 13, fontFamily: T.sans, fontWeight: 500, flex: 1, minWidth: 0 }}>
+                        {thema.title}
+                        {thema.title_local && thema.title_local !== thema.title && (
+                          <span style={{ color: T.textMuted, fontSize: 11, fontFamily: T.mono, marginLeft: 6 }}>
+                            · {thema.title_local}
+                          </span>
+                        )}
+                      </span>
+                      {zHint.primary_level && (
+                        <span style={{
+                          display: "inline-flex", alignItems: "center", gap: 5,
+                          padding: "2px 7px", background: levelColor + "22",
+                          border: `1px solid ${levelColor}55`, borderRadius: T.r,
+                          color: levelColor, fontSize: 10, fontFamily: T.mono, fontWeight: 600,
+                        }}>
+                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: levelColor }} />
+                          {zHint.primary_level}
+                        </span>
+                      )}
                     </div>
-                    <Badge color={statusColors[phase.status]} bg={statusColors[phase.status] + "22"}>{phase.status}</Badge>
-                  </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 8 }}>
-                    {phase.items.map((item, j) => (
-                      <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                        <div style={{ width: 4, height: 4, borderRadius: "50%", background: statusColors[phase.status], marginTop: 6, flexShrink: 0, opacity: 0.5 }} />
-                        <span style={{ color: T.silver, fontSize: 12, fontFamily: T.sans, lineHeight: 1.5 }}>{item}</span>
+                    {/* Source chips */}
+                    {thema.sources?.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 6 }}>
+                        {thema.sources.map(s => (
+                          <span key={s} style={{
+                            color: T.textDim, fontSize: 9, fontFamily: T.mono,
+                            padding: "1px 5px", border: `1px solid ${T.border}`,
+                            borderRadius: 3,
+                          }}>
+                            {THEMEN_SOURCES[s]?.label || s}
+                          </span>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                    )}
 
-          {/* Final note */}
-          <div style={{ textAlign: "center", marginTop: 20, padding: "16px" }}>
-            <p style={{ color: T.textDim, fontSize: 12, fontFamily: T.sans, fontStyle: "italic", lineHeight: 1.6 }}>
-              Maßstab: Wenn es ohne uns funktioniert, haben wir unseren Job gemacht.
+                    {/* Expand/collapse controls for detailed items */}
+                    {isFull ? (
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, gap: 8, flexWrap: "wrap" }}>
+                        <button
+                          onClick={() => setExpandedThema(isOpen ? null : thema.id)}
+                          style={{
+                            background: "none", border: "none", color: T.silver,
+                            fontSize: 11, fontFamily: T.mono, cursor: "pointer",
+                            padding: 0, textDecoration: "underline", textUnderlineOffset: 3,
+                          }}
+                        >
+                          {isOpen ? tht.collapse : tht.expand}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setComposerSeed(themaAsComposerSeed(thema));
+                            setSelectedTopic({ title: thema.title, id: thema.id });
+                            setView("vorschlag");
+                          }}
+                          style={{
+                            background: T.accentDim, border: `1px solid ${T.accent}44`,
+                            color: T.accent, fontSize: 11, fontFamily: T.mono, fontWeight: 600,
+                            padding: "4px 10px", borderRadius: T.r, cursor: "pointer",
+                          }}
+                        >
+                          {tht.toComposer}
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
+                        <button
+                          onClick={() => {
+                            setComposerSeed(themaAsComposerSeed(thema));
+                            setSelectedTopic({ title: thema.title, id: thema.id });
+                            setView("vorschlag");
+                          }}
+                          style={{
+                            background: "transparent", border: `1px solid ${T.border}`,
+                            color: T.textMuted, fontSize: 10, fontFamily: T.mono,
+                            padding: "2px 8px", borderRadius: T.r, cursor: "pointer",
+                          }}
+                        >
+                          {tht.toComposer}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Expanded detail (full items only) */}
+                    {isFull && isOpen && (
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${T.border}` }}>
+                        {thema.problem && (
+                          <div style={{ marginBottom: 10 }}>
+                            <span style={{ color: T.coral, fontSize: 10, fontFamily: T.mono, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                              {tht.problemLabel}
+                            </span>
+                            <p style={{ color: T.silver, fontSize: 12, fontFamily: T.sans, margin: "4px 0 0", lineHeight: 1.5 }}>
+                              {thema.problem}
+                            </p>
+                          </div>
+                        )}
+                        {thema.proposals?.length > 0 && (
+                          <div style={{ marginBottom: 10 }}>
+                            <span style={{ color: T.accent, fontSize: 10, fontFamily: T.mono, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                              {tht.proposalsLabel}
+                            </span>
+                            <ol style={{ color: T.silver, fontSize: 12, fontFamily: T.sans, margin: "4px 0 0", paddingLeft: 20, lineHeight: 1.6 }}>
+                              {thema.proposals.map((p, i) => (
+                                <li key={i} style={{ marginBottom: 2 }}>{p}</li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                        {zHint.note && (
+                          <div style={{ padding: "8px 10px", background: T.bg, border: `1px dashed ${T.border}`, borderRadius: T.r }}>
+                            <span style={{ color: T.textMuted, fontSize: 9, fontFamily: T.mono, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                              {tht.hintLabel}
+                            </span>
+                            <p style={{ color: T.silver, fontSize: 11, fontFamily: T.sans, margin: "3px 0 0", lineHeight: 1.5 }}>
+                              {zHint.note}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, fontStyle: "italic", marginTop: 10, lineHeight: 1.5 }}>
+              {tht.shortNote}
             </p>
           </div>
         </div>
@@ -536,9 +707,11 @@ export default function DeineStimmeApp() {
           </div>
 
           <ProposalComposer
+            key={composerSeed ? `seed-${composerSeed.slice(0, 40)}` : "empty"}
             topicTitle={selectedTopic?.title || "Freier Vorschlag"}
             onSubmit={handleProposalSubmit}
             currentUser={currentUser}
+            initialText={composerSeed}
           />
 
           {/* How it works */}
@@ -701,6 +874,80 @@ export default function DeineStimmeApp() {
         
       )}
 
+      {/* ═══ ZUSTÄNDIGKEIT (Quick-Look) ═══ */}
+      {view === "zustaendigkeit" && (
+        <div>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ color: T.text, fontSize: 20, fontFamily: T.sans, fontWeight: 600, margin: "0 0 6px" }}>
+              {zt.tabPageTitle}
+            </h2>
+            <p style={{ color: T.silver, fontSize: 13, fontFamily: T.sans, lineHeight: 1.6, margin: 0 }}>
+              {zt.tabPageSub}
+            </p>
+            {lang !== "de" && (
+              <p style={{ color: T.textMuted, fontSize: 11, fontFamily: T.mono, lineHeight: 1.5, margin: "8px 0 0" }}>
+                {zt.searchLanguageHint}
+              </p>
+            )}
+          </div>
+
+          {/* Search input */}
+          <div style={{ marginBottom: 14 }}>
+            <input
+              type="text"
+              value={zustQuery}
+              onChange={(e) => setZustQuery(e.target.value)}
+              placeholder={zt.tabInputPlaceholder}
+              autoFocus
+              style={{
+                width: "100%", background: T.bg,
+                border: `1px solid ${T.border}`,
+                borderRadius: T.r, padding: "12px 16px",
+                color: T.text, fontSize: 15, fontFamily: T.sans,
+                outline: "none", boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* Example chips */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
+            <span style={{ color: T.textMuted, fontSize: 10, fontFamily: T.mono, alignSelf: "center", marginRight: 4 }}>
+              {zt.tabExamples}:
+            </span>
+            {EXAMPLE_QUERIES.map((ex) => (
+              <button
+                key={ex}
+                onClick={() => setZustQuery(ex)}
+                style={{
+                  background: T.surfaceActive, border: `1px solid ${T.border}`,
+                  borderRadius: T.r, padding: "4px 10px",
+                  color: T.silver, fontSize: 11, fontFamily: T.mono,
+                  cursor: "pointer",
+                }}
+              >
+                {ex}
+              </button>
+            ))}
+          </div>
+
+          {/* Live result */}
+          <ZustaendigkeitInline query={zustQuery} lang={lang} variant="tab" minChars={2} />
+
+          {/* Link to full page */}
+          <div style={{ marginTop: 14, textAlign: "right" }}>
+            <a
+              href={zustQuery.trim() ? `/zustaendigkeit?q=${encodeURIComponent(zustQuery.trim())}&lang=${lang}` : `/zustaendigkeit?lang=${lang}`}
+              style={{
+                color: T.accent, fontSize: 12, fontFamily: T.mono,
+                textDecoration: "none",
+              }}
+            >
+              {zt.tabFullPageLink}
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* ═══ VERTRAGSANALYSE ═══ */}
       {view === "vertragsanalyse" && (
         
@@ -712,6 +959,11 @@ export default function DeineStimmeApp() {
       <div style={{ marginTop: 40, padding: "16px 0", borderTop: `1px solid ${T.border}`, textAlign: "center" }}>
         <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: 0 }}>die würde des menschen als oberstes gebot — alles weitere lässt sich daraus ableiten</p>
         <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: "4px 0 0" }}>deinestimme.org — prototyp v0.6 — testversion</p>
+        <p style={{ color: T.textDim, fontSize: 10, fontFamily: T.mono, margin: "8px 0 0" }}>
+          <a href="/engine/" style={{ color: T.textDim, textDecoration: "none", borderBottom: `1px dotted ${T.textDim}` }}>
+            Technische Architektur · Zuständigkeits-Engine v0.5
+          </a>
+        </p>
       </div>
     </div>
   );

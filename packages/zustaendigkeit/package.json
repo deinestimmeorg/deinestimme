@@ -1,0 +1,35 @@
+{
+  "name": "@deinestimme/zustaendigkeit",
+  "version": "0.1.0",
+  "description": "Politische Zuständigkeitszuordnung: Thema → Gemeinde/Kreis/Land/Bund/EU mit Confidence + Evidence + Explanation (GG + TFEU + LeiKa).",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./rules": "./src/rules.js",
+    "./normalize": "./src/normalize.js",
+    "./eu-channels": "./src/eu-channels.js",
+    "./data/*": "./src/data/*.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "zustaendigkeit",
+    "competence",
+    "federalism",
+    "subsidiarity",
+    "EU",
+    "Grundgesetz",
+    "AEUV",
+    "LeiKa",
+    "EuroVoc"
+  ],
+  "author": "Strauss & Reinemann GbR",
+  "license": "AGPL-3.0-or-later",
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ]
+}

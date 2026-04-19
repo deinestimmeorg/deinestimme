@@ -1,4 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import ZustaendigkeitInline from "./ZustaendigkeitInline";
+import { getZustT } from "../zustaendigkeitI18n";
+import { useTranslation } from "./LanguageSelector";
 import { T } from "../tokens";
 
 // ─── Spracherkennung: IST-Zustand vs. Lösungsvorschlag ───
@@ -108,13 +111,34 @@ function lerpColor(a, b, t) {
 }
 
 // ─── Hauptkomponente ───
-export default function ProposalComposer({ topicTitle, onSubmit, onCancel, currentUser }) {
-  const [text, setText] = useState("");
+export default function ProposalComposer({ topicTitle, onSubmit, onCancel, currentUser, initialText = "" }) {
+  const [text, setText] = useState(initialText);
   const [analysis, setAnalysis] = useState({ ratio: 0.5, istScore: 0, loesungScore: 0, phase: "leer" });
   const [showHelper, setShowHelper] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  // Allow external seeding (e.g. a theme card in /app Themen) to hydrate the composer
+  useEffect(() => {
+    if (initialText && initialText !== text) {
+      setText(initialText);
+      setAnalysis(analyzeText(initialText));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialText]);
+  const [testBannerDismissed, setTestBannerDismissed] = useState(
+    () => typeof sessionStorage !== "undefined" && sessionStorage.getItem("ds_zust_banner_dismissed") === "true"
+  );
+  const { lang } = useTranslation();
+  const zt = getZustT(lang);
   const textareaRef = useRef(null);
   const debounceRef = useRef(null);
+
+  const dismissBanner = () => {
+    setTestBannerDismissed(true);
+    try {
+      sessionStorage.setItem("ds_zust_banner_dismissed", "true");
+    } catch {}
+  };
 
   // Debounced analysis
   const updateAnalysis = useCallback((val) => {
@@ -172,6 +196,40 @@ export default function ProposalComposer({ topicTitle, onSubmit, onCancel, curre
       background: T.surface, border: `1px solid ${T.border}`, borderRadius: T.rl,
       overflow: "hidden",
     }}>
+      {/* TEST-Banner: Zuständigkeit-Hinweis */}
+      {!testBannerDismissed && (
+        <div style={{
+          display: "flex", alignItems: "flex-start", gap: 10,
+          padding: "10px 14px", background: T.accentDim,
+          borderBottom: `1px solid ${T.accent}33`,
+        }}>
+          <span style={{
+            color: T.accent, fontSize: 9, fontFamily: T.mono, fontWeight: 700,
+            letterSpacing: "0.08em", background: T.bg,
+            padding: "2px 6px", borderRadius: 3, flexShrink: 0, marginTop: 1,
+          }}>
+            TEST
+          </span>
+          <p style={{
+            color: T.silver, fontSize: 11, fontFamily: T.sans,
+            lineHeight: 1.55, margin: 0, flex: 1,
+          }}>
+            {zt.testBanner.replace(/^TEST\s*·\s*/, "")}
+          </p>
+          <button
+            onClick={dismissBanner}
+            aria-label={zt.dismissAria}
+            style={{
+              background: "none", border: "none", color: T.textMuted,
+              cursor: "pointer", fontSize: 16, lineHeight: 1,
+              padding: 0, flexShrink: 0,
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Phase indicator bar */}
       <div style={{
         height: 3, background: T.bg,
@@ -344,6 +402,11 @@ export default function ProposalComposer({ topicTitle, onSubmit, onCancel, curre
             </p>
           </div>
         )}
+
+        {/* Live-Zuständigkeits-Block */}
+        <div style={{ marginTop: 12 }}>
+          <ZustaendigkeitInline query={text} lang={lang} variant="composer" minChars={4} />
+        </div>
 
         {/* Submit area */}
         <div style={{

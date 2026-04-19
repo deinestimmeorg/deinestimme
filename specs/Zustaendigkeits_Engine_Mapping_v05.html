@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zuständigkeits-Engine v0.5 — Mapping-Dokument</title>
+<style>
+  :root {
+    --void: #0B0B0F;
+    --void-2: #16161D;
+    --void-3: #1F1F28;
+    --turquoise: #00C9B0;
+    --turquoise-dim: #008F7F;
+    --royal: #5B8DEF;
+    --amber: #E8943A;
+    --silver: #C0C8D0;
+    --muted: #5A6068;
+    --divider: #2A2A33;
+    --text: #E8E8E8;
+    --font-mono: 'DM Mono', 'Menlo', 'Consolas', monospace;
+    --font-serif: 'Crimson Pro', 'Georgia', serif;
+    --font-sans: 'Inter', -apple-system, 'Helvetica Neue', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--void);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  header.hero {
+    padding: 48px 32px 32px;
+    border-bottom: 1px solid var(--divider);
+    background: linear-gradient(180deg, var(--void-2) 0%, var(--void) 100%);
+  }
+  header.hero .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--turquoise);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  header.hero h1 {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: 42px;
+    margin: 0 0 12px;
+    color: var(--text);
+  }
+  header.hero .sub {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: 20px;
+    color: var(--silver);
+    margin: 0 0 20px;
+  }
+  header.hero .meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* Navigation */
+  nav.toc {
+    position: sticky;
+    top: 0;
+    background: var(--void);
+    border-bottom: 1px solid var(--divider);
+    padding: 12px 32px;
+    z-index: 100;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+  nav.toc a {
+    color: var(--silver);
+    text-decoration: none;
+    margin-right: 24px;
+    padding: 4px 0;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav.toc a:hover {
+    color: var(--turquoise);
+    border-bottom-color: var(--turquoise);
+  }
+
+  /* Main */
+  main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  section {
+    margin-bottom: 64px;
+    scroll-margin-top: 60px;
+  }
+
+  section > h2 {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: 32px;
+    margin: 0 0 8px;
+    color: var(--text);
+  }
+  section > .lead {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: 17px;
+    color: var(--silver);
+    margin: 0 0 24px;
+    max-width: 820px;
+  }
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 22px;
+    margin: 32px 0 12px;
+    color: var(--text);
+  }
+  h4 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--turquoise);
+    margin: 24px 0 8px;
+  }
+
+  p { margin: 0 0 14px; }
+  strong { color: var(--text); font-weight: 600; }
+  code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--void-3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--turquoise);
+  }
+
+  /* Diagram container */
+  .diagram {
+    background: var(--void-2);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    padding: 24px;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+  .diagram svg {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+  }
+  .diagram .caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 16px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Details / aufklappbar */
+  details {
+    background: var(--void-2);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    margin: 12px 0;
+    padding: 0;
+    transition: border-color 0.15s;
+  }
+  details:hover { border-color: var(--muted); }
+  details[open] { border-color: var(--turquoise-dim); }
+  details summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: "+";
+    color: var(--turquoise);
+    font-size: 18px;
+    font-weight: 300;
+    margin-left: 12px;
+    transition: transform 0.2s;
+  }
+  details[open] summary::after {
+    content: "−";
+  }
+  details summary .label-tag {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-right: 12px;
+    padding: 2px 8px;
+    border: 1px solid var(--amber);
+    border-radius: 3px;
+  }
+  details summary .label-tag.eu { color: var(--royal); border-color: var(--royal); }
+  details summary .label-tag.nl { color: var(--turquoise); border-color: var(--turquoise); }
+  details summary .label-tag.de { color: #D4A853; border-color: #D4A853; }
+  details summary .label-tag.fr { color: #C77DFF; border-color: #C77DFF; }
+  details summary .label-tag.it { color: #FF6B6B; border-color: #FF6B6B; }
+  details .body {
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--divider);
+    margin-top: 0;
+    padding-top: 14px;
+  }
+  details .body p:first-child { margin-top: 0; }
+
+  /* Adapter-Card */
+  .adapter-card {
+    background: var(--void-2);
+    border: 1px solid var(--divider);
+    border-left: 3px solid var(--turquoise);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .adapter-card.de { border-left-color: #D4A853; }
+  .adapter-card.nl { border-left-color: var(--turquoise); }
+  .adapter-card.eu { border-left-color: var(--royal); }
+  .adapter-card.fr { border-left-color: #C77DFF; }
+  .adapter-card.it { border-left-color: #FF6B6B; }
+  .adapter-card h3 { margin-top: 0; }
+  .adapter-card .subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 16px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--divider);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  tr:hover td { background: var(--void-2); }
+
+  /* Code block */
+  pre.codeblock {
+    background: var(--void-3);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--silver);
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+  pre.codeblock .cm { color: var(--muted); }
+  pre.codeblock .kw { color: var(--turquoise); }
+  pre.codeblock .st { color: var(--amber); }
+
+  /* Grid layouts */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin: 16px 0;
+  }
+  @media (min-width: 720px) {
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  }
+  .quadrant {
+    background: var(--void-2);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+  .quadrant .q-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--turquoise);
+    margin-bottom: 8px;
+  }
+  .quadrant p { font-size: 13px; color: var(--silver); margin: 0; }
+
+  /* Footer */
+  footer.final {
+    margin-top: 80px;
+    padding: 32px;
+    border-top: 1px solid var(--divider);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  /* Print adjustments */
+  @media print {
+    body { background: white; color: black; }
+    nav.toc { display: none; }
+    details { page-break-inside: avoid; border: 1px solid #ccc; }
+    details[open] summary::after { content: ""; }
+    .diagram { break-inside: avoid; border: 1px solid #ddd; background: #fafafa; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="tag">DeineStimme.org · Zuständigkeits-Engine · Mapping</div>
+  <h1>Mapping-Dokument v0.5</h1>
+  <div class="sub">5 Länder-Adapter · 7 Override-Stufen · 17 Sub-Adapter · 4 Schichten</div>
+  <div class="meta">Stand 19. April 2026 · AGPL-3.0 · Basis: Spec v0.5</div>
+</header>
+
+<nav class="toc">
+  <a href="#overview">Überblick</a>
+  <a href="#architektur">Architektur</a>
+  <a href="#override">7-Stufen-Override</a>
+  <a href="#selektor">Adapter-Selektor</a>
+  <a href="#adapters">5 Adapter</a>
+  <a href="#subadapter">Sub-Adapter-Baum</a>
+  <a href="#dimensions">Vier Dimensionen</a>
+  <a href="#jurisprudenz">Rechtsprechung</a>
+  <a href="#datenquellen">Datenquellen</a>
+  <a href="#eurovoc">EuroVoc-Mapping</a>
+</nav>
+
+<main>
+
+<!-- ============================================================ -->
+<section id="overview">
+  <h2>Überblick</h2>
+  <p class="lead">
+    Dieses Dokument ist die visuelle Begleitung zu Spec v0.5. Es bildet dieselbe Entscheidungslogik ab,
+    aber als Schaubilder und aufklappbare Referenzkarten — nicht als fortlaufenden Text. Es ist
+    nachschlagbar, nicht linear.
+  </p>
+
+  <div class="grid-4">
+    <div class="quadrant">
+      <div class="q-title">5 Adapter</div>
+      <p>DE · NL · EU horizontal · FR · IT</p>
+    </div>
+    <div class="quadrant">
+      <div class="q-title">4 Schichten</div>
+      <p>A Normalisierung · B Kompetenz-Engine · C Retrieval/Ranking · D Prozeduralpfad</p>
+    </div>
+    <div class="quadrant">
+      <div class="q-title">7 Override-Stufen</div>
+      <p>von EU-Exklusiv bis gerichtliche Eskalation, hierarchisch abgearbeitet</p>
+    </div>
+    <div class="quadrant">
+      <div class="q-title">17 Sub-Adapter</div>
+      <p>3 FR-Sonderkörperschaften · 10 Outre-mer · 4 EPCI-Klassen · 7 IT-Statuto-speciale</p>
+    </div>
+  </div>
+
+  <p>
+    Die Engine beantwortet eine einzige Frage: <em>„Wer ist für diese Freitext-Eingabe zuständig,
+    auf welcher Ebene, mit welchen mitwirkenden Stellen, und welcher Prozeduralpfad ist einzuhalten?"</em>
+    Die Antwort kommt als strukturierte <code>authorities</code>-Liste mit vier Output-Kategorien:
+    <strong>zuständig</strong>, <strong>mitwirkend</strong>, <strong>weiterleitungspflichtig</strong>,
+    <strong>eskalationsfähig</strong>.
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<section id="architektur">
+  <h2>Gesamtarchitektur</h2>
+  <p class="lead">
+    Input ist Freitext. Output ist eine kategorisierte <code>authorities</code>-Liste. Zwischen beidem
+    laufen vier Schichten, ein Adapter-Selektor und das 7-Stufen-Override-Register.
+  </p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1100 640" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#5A6068"/>
+        </marker>
+        <marker id="arrowTurq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#00C9B0"/>
+        </marker>
+      </defs>
+
+      <!-- Input -->
+      <rect x="450" y="20" width="200" height="48" rx="6" fill="#16161D" stroke="#00C9B0" stroke-width="1.5"/>
+      <text x="550" y="44" text-anchor="middle" fill="#E8E8E8" font-family="DM Mono, Menlo, monospace" font-size="14">Freitext-Input</text>
+      <text x="550" y="60" text-anchor="middle" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="10">"Lärmschutz an Flughäfen..."</text>
+
+      <!-- Schicht A -->
+      <rect x="380" y="108" width="340" height="60" rx="6" fill="#1F1F28" stroke="#5A6068"/>
+      <text x="550" y="132" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="11" letter-spacing="1.5">SCHICHT A — NORMALISIERUNG</text>
+      <text x="550" y="152" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="12">EuroVoc-Deskriptor · Synonymlexikon · Lemmatisierung</text>
+
+      <!-- Adapter-Selektor -->
+      <rect x="380" y="200" width="340" height="60" rx="6" fill="#1F1F28" stroke="#00C9B0" stroke-width="1.5"/>
+      <text x="550" y="224" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="11" letter-spacing="1.5">ADAPTER-SELEKTOR (v0.5 neu)</text>
+      <text x="550" y="244" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="12">country · territorium · sonderstatus · epci_class</text>
+
+      <!-- 5 Adapters row -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="11">
+        <rect x="40" y="290" width="160" height="50" rx="4" fill="#16161D" stroke="#D4A853"/>
+        <text x="120" y="310" text-anchor="middle" fill="#D4A853">DE-Adapter</text>
+        <text x="120" y="326" text-anchor="middle" fill="#5A6068" font-size="10">LeiKa · GG Art. 70–74</text>
+
+        <rect x="212" y="290" width="160" height="50" rx="4" fill="#16161D" stroke="#00C9B0"/>
+        <text x="292" y="310" text-anchor="middle" fill="#00C9B0">NL-Adapter</text>
+        <text x="292" y="326" text-anchor="middle" fill="#5A6068" font-size="10">Awb · bestuursorgaan</text>
+
+        <rect x="384" y="290" width="160" height="50" rx="4" fill="#16161D" stroke="#5B8DEF"/>
+        <text x="464" y="310" text-anchor="middle" fill="#5B8DEF">EU horizontal</text>
+        <text x="464" y="326" text-anchor="middle" fill="#5A6068" font-size="10">Art. 5 EUV · 288 AEUV</text>
+
+        <rect x="556" y="290" width="160" height="50" rx="4" fill="#16161D" stroke="#C77DFF"/>
+        <text x="636" y="310" text-anchor="middle" fill="#C77DFF">FR-Adapter</text>
+        <text x="636" y="326" text-anchor="middle" fill="#5A6068" font-size="10">CGCT · post-NOTRe</text>
+
+        <rect x="728" y="290" width="160" height="50" rx="4" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="808" y="310" text-anchor="middle" fill="#FF6B6B">IT-Adapter</text>
+        <text x="808" y="326" text-anchor="middle" fill="#5A6068" font-size="10">Art. 117 Cost.</text>
+
+        <rect x="900" y="290" width="160" height="50" rx="4" fill="#16161D" stroke="#5A6068" stroke-dasharray="3,3"/>
+        <text x="980" y="310" text-anchor="middle" fill="#5A6068">(AT · BE · PL)</text>
+        <text x="980" y="326" text-anchor="middle" fill="#5A6068" font-size="10">Phase 4</text>
+      </g>
+
+      <!-- Sub-Adapter-Indikator -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#5A6068">
+        <text x="636" y="365" text-anchor="middle">↓ 13 Sub-Adapter</text>
+        <text x="808" y="365" text-anchor="middle">↓ 7 Sub-Adapter</text>
+      </g>
+
+      <!-- Schicht B -->
+      <rect x="380" y="388" width="340" height="60" rx="6" fill="#1F1F28" stroke="#5A6068"/>
+      <text x="550" y="412" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="11" letter-spacing="1.5">SCHICHT B — KOMPETENZ-ENGINE</text>
+      <text x="550" y="432" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="12">7-Stufen-Override-Register · Vier-Dimensionen-Zerlegung</text>
+
+      <!-- Schicht C -->
+      <rect x="380" y="470" width="340" height="60" rx="6" fill="#1F1F28" stroke="#5A6068"/>
+      <text x="550" y="494" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="11" letter-spacing="1.5">SCHICHT C — RETRIEVAL + RANKING</text>
+      <text x="550" y="514" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="12">CELLAR · Normattiva · Legifrance · wetten.overheid.nl</text>
+
+      <!-- Schicht D -->
+      <rect x="380" y="552" width="340" height="60" rx="6" fill="#1F1F28" stroke="#5A6068"/>
+      <text x="550" y="576" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="11" letter-spacing="1.5">SCHICHT D — PROZEDURALPFAD (v0.4 neu)</text>
+      <text x="550" y="596" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="12">Fristen · Weiterleitung · Kooperation · Vorlage Art. 267</text>
+
+      <!-- Arrows -->
+      <line x1="550" y1="68" x2="550" y2="105" stroke="#5A6068" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="550" y1="168" x2="550" y2="197" stroke="#00C9B0" stroke-width="1.5" marker-end="url(#arrowTurq)"/>
+      <line x1="550" y1="260" x2="550" y2="286" stroke="#00C9B0" stroke-width="1.5" marker-end="url(#arrowTurq)"/>
+      <line x1="550" y1="340" x2="550" y2="385" stroke="#5A6068" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="550" y1="448" x2="550" y2="467" stroke="#5A6068" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="550" y1="530" x2="550" y2="549" stroke="#5A6068" stroke-width="1.5" marker-end="url(#arrow)"/>
+    </svg>
+    <div class="caption">Fig. 1 — Schichtenmodell. Input ↓ Schicht A ↓ Adapter-Selektor → 5 Country Adapter → Schicht B → C → D</div>
+  </div>
+
+  <h3>Output-Kategorien</h3>
+  <div class="grid-4">
+    <div class="quadrant">
+      <div class="q-title" style="color: var(--turquoise)">zuständig</div>
+      <p>Primäre Regelungs- oder Vollzugskompetenz</p>
+    </div>
+    <div class="quadrant">
+      <div class="q-title" style="color: var(--royal)">mitwirkend</div>
+      <p>Kooperations-, Konsultations-, Mitentscheidungsrecht</p>
+    </div>
+    <div class="quadrant">
+      <div class="q-title" style="color: var(--amber)">weiterleitungspflichtig</div>
+      <p>Formell unzuständig, muss nach Awb 2:3/6:15 oder VwVfG § 3(2) weiterreichen</p>
+    </div>
+    <div class="quadrant">
+      <div class="q-title" style="color: #FF6B6B">eskalationsfähig</div>
+      <p>Vorlage Art. 267 AEUV oder Corte Costituzionale (Sent. 269/2017)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="override">
+  <h2>Das 7-Stufen-Override-Register</h2>
+  <p class="lead">
+    Overrides werden strikt hierarchisch abgearbeitet. Eine niedrigere Stufe wird nur erreicht,
+    wenn höhere nicht greifen. Confidence-Scores dürfen harte Vorrang- oder Ausschlussregeln nie überstimmen.
+  </p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg">
+      <!-- Seven layers -->
+      <g font-family="Inter, sans-serif" font-size="13">
+        <rect x="100" y="20" width="700" height="60" rx="4" fill="#16161D" stroke="#5B8DEF" stroke-width="1.5"/>
+        <text x="120" y="45" fill="#5B8DEF" font-family="DM Mono, Menlo, monospace" font-size="24" font-weight="700">1</text>
+        <text x="160" y="45" fill="#E8E8E8" font-weight="600">Unionsrechtliche Exklusiv-/Vorrangregel</text>
+        <text x="160" y="65" fill="#C0C8D0" font-size="12">Zollunion · Währungspolitik Eurozone · Art. 3 AEUV</text>
+
+        <rect x="100" y="90" width="700" height="60" rx="4" fill="#16161D" stroke="#5B8DEF"/>
+        <text x="120" y="115" fill="#5B8DEF" font-family="DM Mono, Menlo, monospace" font-size="24" font-weight="700">2</text>
+        <text x="160" y="115" fill="#E8E8E8" font-weight="600">Sektorspezifischer Unionsmechanismus</text>
+        <text x="160" y="135" fill="#C0C8D0" font-size="12">DSGVO one-stop-shop · ECN-Fallzuweisung · IMI-Kooperation</text>
+
+        <rect x="100" y="160" width="700" height="60" rx="4" fill="#1F1F28" stroke="#00C9B0" stroke-width="2"/>
+        <text x="120" y="185" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="24" font-weight="700">3</text>
+        <text x="160" y="185" fill="#E8E8E8" font-weight="600">Transversale nationale Durchbruchskompetenz</text>
+        <text x="160" y="205" fill="#C0C8D0" font-size="12">IT materie trasversali · DE Art. 84/85 GG · NL medebewind · FR intérêt national</text>
+        <text x="760" y="180" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="9" letter-spacing="1" text-anchor="end">NEU v0.5</text>
+
+        <rect x="100" y="230" width="700" height="60" rx="4" fill="#16161D" stroke="#D4A853"/>
+        <text x="120" y="255" fill="#D4A853" font-family="DM Mono, Menlo, monospace" font-size="24" font-weight="700">4</text>
+        <text x="160" y="255" fill="#E8E8E8" font-weight="600">Nationale Spezialzuständigkeit</text>
+        <text x="160" y="275" fill="#C0C8D0" font-size="12">Kaderwet zbo (NL) · LeiKa-Typ 1 (DE) · Art. 117(2) Cost. · régalienne Kompetenzen (FR)</text>
+
+        <rect x="100" y="300" width="700" height="60" rx="4" fill="#16161D" stroke="#E8943A"/>
+        <text x="120" y="325" fill="#E8943A" font-family="DM Mono, Menlo, monospace" font-size="24" font-weight="700">5</text>
+        <text x="160" y="325" fill="#E8E8E8" font-weight="600">Zulässige Delegation / Mandat</text>
+        <text x="160" y="345" fill="#C0C8D0" font-size="12">Titel 10.1 Awb · § 14 VwVfG · Konvention Métropole–Département · Norme di attuazione</text>
+
+        <rect x="100" y="370" width="700" height="60" rx="4" fill="#16161D" stroke="#00C9B0"/>
+        <text x="120" y="395" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="24" font-weight="700">6</text>
+        <text x="160" y="395" fill="#E8E8E8" font-weight="600">Weiterleitungs- und Kooperationspflicht</text>
+        <text x="160" y="415" fill="#C0C8D0" font-size="12">Awb Art. 2:3 · Art. 6:15 · § 3(2) VwVfG · IMI-Routing</text>
+
+        <rect x="100" y="440" width="700" height="60" rx="4" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="120" y="465" fill="#FF6B6B" font-family="DM Mono, Menlo, monospace" font-size="24" font-weight="700">7</text>
+        <text x="160" y="465" fill="#E8E8E8" font-weight="600">Gerichtlicher Eskalationspfad</text>
+        <text x="160" y="485" fill="#C0C8D0" font-size="12">Art. 267 AEUV · CILFIT · Foto-Frost · Controlimiti · Sentenza 269/2017 · Arcelor</text>
+
+        <!-- Priority arrow -->
+        <line x1="60" y1="30" x2="60" y2="510" stroke="#5A6068" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="55" y="28" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="10" text-anchor="end">hoch</text>
+        <text x="55" y="518" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="10" text-anchor="end">niedrig</text>
+        <text x="40" y="280" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="10" text-anchor="middle" transform="rotate(-90, 40, 280)">PRIORITÄT</text>
+      </g>
+    </svg>
+    <div class="caption">Fig. 2 — Override-Register in Prioritätsreihenfolge. Stufe 3 ist neu in v0.5 und cross-adapter.</div>
+  </div>
+
+  <h3>Details pro Stufe</h3>
+
+  <details>
+    <summary><span class="label-tag eu">Stufe 1</span> Unionsrechtliche Exklusiv-/Vorrangregel</summary>
+    <div class="body">
+      <p><strong>Trigger:</strong> Thema fällt in Art. 3 AEUV (ausschließliche Unionskompetenz).</p>
+      <p><strong>Typen:</strong> Zollunion · Wettbewerbsregeln Binnenmarkt · Währungspolitik Eurozone ·
+        Erhaltung biologischer Meeresschätze · gemeinsame Handelspolitik.</p>
+      <p><strong>Effekt:</strong> Nur EU ist zuständig. Mitgliedstaaten dürfen nur bei expliziter
+        Ermächtigung oder als reine Umsetzung tätig werden.</p>
+      <p><strong>Engine:</strong> primary_level = EU; keine Nebenzuständigkeiten außer bei expliziter
+        Durchführungszuweisung.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag eu">Stufe 2</span> Sektorspezifischer Unionsmechanismus</summary>
+    <div class="body">
+      <p><strong>Trigger:</strong> Thema fällt unter ein sektorales EU-Kooperationsregime.</p>
+      <p><strong>Beispiele:</strong></p>
+      <ul>
+        <li><strong>DSGVO Art. 56, 60, 65:</strong> Lead Supervisory Authority-Logik bei grenzüberschreitender Datenverarbeitung.</li>
+        <li><strong>VO 1/2003 + ECN:</strong> Fallzuweisung Wettbewerbsrecht, ~2 Monate Reallokation, Art. 11(6) Verdrängungsregel.</li>
+        <li><strong>IMI-VO 1024/2012:</strong> Verwaltungszusammenarbeit zwischen nationalen Behörden bei Binnenmarktrechtsakten.</li>
+      </ul>
+      <p><strong>Effekt:</strong> Der sektorale Mechanismus schlägt die Grundmatrix aus Stufe 1.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag">Stufe 3</span> Transversale nationale Durchbruchskompetenz <em style="color: var(--muted); font-style: normal;">— neu v0.5</em></summary>
+    <div class="body">
+      <p><strong>Trigger:</strong> Der Zentralstaat kann regional-exklusive oder lokal-autonome Kompetenz
+        durchbrechen, weil ein transversaler Zweck tangiert ist. Cross-Adapter-Muster.</p>
+      <p><strong>Länderanker:</strong></p>
+      <ul>
+        <li><strong>IT:</strong> <em>materie trasversali</em> (Umweltschutz Art. 117(2)(s), Wettbewerbsschutz,
+          LEP/LEA) schneiden quer durch regionale Zuständigkeiten (Corte Costituzionale, std. Rspr.).</li>
+        <li><strong>DE:</strong> Art. 84/85 GG Bundesaufsicht über Landesvollzug; Art. 72(3) Abweichungsrecht.</li>
+        <li><strong>NL:</strong> <em>medebewind</em> (Art. 124 Grondwet) — Rijk bindet Gemeinden/Provinzen in
+          Aufgaben außerhalb ihrer eigenen Sphäre ein.</li>
+        <li><strong>FR:</strong> <em>intérêt national</em> via Conseil-constitutionnel-Judikatur und
+          Arcelor-Doktrin — nationale Sicherheit, öffentliche Ordnung als Verfassungsidentität.</li>
+      </ul>
+      <p><strong>Unterschied zu Stufe 4:</strong> Stufe 3 ist piercing (Staat interveniert in <em>fremde</em>
+        Zuständigkeit). Stufe 4 ist Bestätigung einer <em>eigenen</em> staatlichen Zuständigkeit.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag">Stufe 4</span> Nationale Spezialzuständigkeit</summary>
+    <div class="body">
+      <p><strong>Trigger:</strong> Nationale Rechtsordnung weist dem Zentralstaat eine klar umgrenzte
+        exklusive Zuständigkeit zu.</p>
+      <p><strong>Typen:</strong> Enumerierte Materien Art. 117(2) Cost. · LeiKa-Typ 1 (Bund regelt + vollzieht) ·
+        Kaderwet zbo (NL) · régalienne Kompetenzen (FR: Justiz, Verteidigung, Außenpolitik).</p>
+      <p><strong>Engine:</strong> primary_level = national; keine regionale/lokale Zuständigkeit.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag">Stufe 5</span> Zulässige Delegation / Mandat</summary>
+    <div class="body">
+      <p><strong>Trigger:</strong> Eine andere Stelle handelt für die zuständige — mit gesetzlich tragfähiger
+        Delegations- oder Mandatsgrundlage.</p>
+      <p><strong>Typen:</strong> Titel 10.1 Awb (NL) · § 14 VwVfG (DE) · Konvention Métropole–Département (FR) ·
+        Norme di attuazione (IT).</p>
+      <p><strong>Harte Regel:</strong> Fehlt die Grundlage, fällt die Zuständigkeit auf das originäre Organ
+        zurück (RvS 17.12.2025, ECLI:NL:RVS:2025:6150 ist Präzedenzfall).</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag">Stufe 6</span> Weiterleitungs- und Kooperationspflicht</summary>
+    <div class="body">
+      <p><strong>Trigger:</strong> Angefragte Stelle ist nicht zuständig, muss den Vorgang aber routen.</p>
+      <p><strong>Normen:</strong></p>
+      <ul>
+        <li><strong>NL:</strong> Awb Art. 2:3 (Verwaltungsanträge), Art. 6:15 (Rechtsbehelfe).</li>
+        <li><strong>DE:</strong> § 3 Abs. 2 VwVfG, § 17 SGB I.</li>
+        <li><strong>FR:</strong> Art. L114-2 CRPA (transmission incompétence).</li>
+        <li><strong>EU:</strong> IMI-Routing, ECN-Fallzuweisung.</li>
+      </ul>
+      <p><strong>Output-Kategorie:</strong> <code>weiterleitungspflichtig</code> mit Ziel-Authority.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag it">Stufe 7</span> Gerichtlicher Eskalationspfad</summary>
+    <div class="body">
+      <p><strong>Trigger:</strong> Zuständigkeit hängt von Auslegung oder Gültigkeit eines höherrangigen
+        Rechtsakts ab.</p>
+      <p><strong>Pfade:</strong></p>
+      <ul>
+        <li><strong>EU:</strong> Art. 267 AEUV — Vorlagepflicht letztinstanzlich (CILFIT),
+          Monopol Gültigkeitsprüfung (Foto-Frost).</li>
+        <li><strong>IT:</strong> Bei GRC + Cost. parallel: zuerst Corte Costituzionale (Sent. 269/2017 —
+          doppelte Präjudizialität), dann ggf. EuGH.</li>
+        <li><strong>FR:</strong> Arcelor-Prüfung — äquivalenter Schutz? Wenn nein und
+          Verfassungsidentität tangiert: EU-Recht unangewendet.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<section id="selektor">
+  <h2>Adapter-Selektor-Flow</h2>
+  <p class="lead">
+    Vor jeder fachlichen Kompetenzprüfung wählt der <code>special_status_detector</code>
+    den passenden Sub-Adapter aus. Falsches Routing macht alle nachgelagerten Schichten unbrauchbar.
+  </p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1080 720" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="aRouter" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#5A6068"/>
+        </marker>
+      </defs>
+
+      <!-- Input -->
+      <rect x="440" y="20" width="200" height="46" rx="6" fill="#16161D" stroke="#00C9B0"/>
+      <text x="540" y="48" text-anchor="middle" fill="#E8E8E8" font-family="DM Mono, Menlo, monospace" font-size="13">resolveAdapter(input)</text>
+
+      <!-- country switch -->
+      <polygon points="540,100 600,130 540,160 480,130" fill="#1F1F28" stroke="#5A6068"/>
+      <text x="540" y="134" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="12">country?</text>
+
+      <!-- 5 branches from country -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="11">
+        <!-- DE -->
+        <rect x="30" y="230" width="140" height="40" rx="4" fill="#16161D" stroke="#D4A853"/>
+        <text x="100" y="255" text-anchor="middle" fill="#D4A853">de_adapter</text>
+        <text x="100" y="200" text-anchor="middle" fill="#5A6068" font-size="10">DE</text>
+        <line x1="480" y1="130" x2="100" y2="228" stroke="#5A6068" stroke-dasharray="2,3"/>
+
+        <!-- NL -->
+        <rect x="190" y="230" width="140" height="40" rx="4" fill="#16161D" stroke="#00C9B0"/>
+        <text x="260" y="255" text-anchor="middle" fill="#00C9B0">nl_adapter</text>
+        <text x="260" y="200" text-anchor="middle" fill="#5A6068" font-size="10">NL</text>
+        <line x1="500" y1="130" x2="260" y2="228" stroke="#5A6068" stroke-dasharray="2,3"/>
+
+        <!-- EU horizontal -->
+        <rect x="470" y="230" width="140" height="40" rx="4" fill="#16161D" stroke="#5B8DEF"/>
+        <text x="540" y="255" text-anchor="middle" fill="#5B8DEF">eu_horizontal</text>
+        <line x1="540" y1="160" x2="540" y2="228" stroke="#5A6068"/>
+      </g>
+
+      <!-- FR branch with detector -->
+      <rect x="650" y="200" width="180" height="46" rx="6" fill="#1F1F28" stroke="#C77DFF" stroke-width="1.5"/>
+      <text x="740" y="222" text-anchor="middle" fill="#C77DFF" font-family="DM Mono, Menlo, monospace" font-size="11">FR-Detektor</text>
+      <text x="740" y="238" text-anchor="middle" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="9">Paris/Lyon/Corse/Art.73/74/EPCI?</text>
+      <line x1="600" y1="140" x2="720" y2="198" stroke="#5A6068" stroke-dasharray="2,3"/>
+
+      <!-- IT branch with detector -->
+      <rect x="870" y="200" width="180" height="46" rx="6" fill="#1F1F28" stroke="#FF6B6B" stroke-width="1.5"/>
+      <text x="960" y="222" text-anchor="middle" fill="#FF6B6B" font-family="DM Mono, Menlo, monospace" font-size="11">IT-Detektor</text>
+      <text x="960" y="238" text-anchor="middle" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="9">Regioni a statuto speciale?</text>
+      <line x1="610" y1="140" x2="890" y2="198" stroke="#5A6068" stroke-dasharray="2,3"/>
+
+      <!-- FR outcomes -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#C77DFF">
+        <rect x="650" y="300" width="80" height="28" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="690" y="319" text-anchor="middle">fr.paris</text>
+        <rect x="740" y="300" width="80" height="28" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="780" y="319" text-anchor="middle">fr.lyon</text>
+        <rect x="650" y="338" width="80" height="28" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="690" y="357" text-anchor="middle">fr.corse</text>
+        <rect x="740" y="338" width="80" height="28" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="780" y="357" text-anchor="middle">fr.art73.*</text>
+        <rect x="650" y="376" width="80" height="28" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="690" y="395" text-anchor="middle">fr.art74.*</text>
+        <rect x="740" y="376" width="80" height="28" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="780" y="395" text-anchor="middle">fr.standard</text>
+      </g>
+
+      <!-- FR EPCI sub -->
+      <rect x="650" y="424" width="180" height="46" rx="6" fill="#1F1F28" stroke="#C77DFF"/>
+      <text x="740" y="446" text-anchor="middle" fill="#C77DFF" font-family="DM Mono, Menlo, monospace" font-size="11">EPCI-Klassifikator</text>
+      <text x="740" y="462" text-anchor="middle" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="9">CC · CA · CU · MET</text>
+
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#5A6068">
+        <rect x="620" y="500" width="52" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="646" y="516" text-anchor="middle">CC</text>
+        <rect x="680" y="500" width="52" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="706" y="516" text-anchor="middle">CA</text>
+        <rect x="740" y="500" width="52" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="766" y="516" text-anchor="middle">CU</text>
+        <rect x="800" y="500" width="52" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="826" y="516" text-anchor="middle">MET</text>
+      </g>
+
+      <!-- IT outcomes -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#FF6B6B">
+        <rect x="870" y="300" width="180" height="24" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="960" y="316" text-anchor="middle">it.statuto.sicilia</text>
+        <rect x="870" y="330" width="180" height="24" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="960" y="346" text-anchor="middle">it.statuto.sardegna</text>
+        <rect x="870" y="360" width="180" height="24" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="960" y="376" text-anchor="middle">it.statuto.valle_daosta</text>
+        <rect x="870" y="390" width="180" height="24" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="960" y="406" text-anchor="middle">it.statuto.friuli_venezia_giulia</text>
+        <rect x="870" y="420" width="180" height="24" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="960" y="436" text-anchor="middle">it.statuto.trentino.trento</text>
+        <rect x="870" y="450" width="180" height="24" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="960" y="466" text-anchor="middle">it.statuto.trentino.bolzano</text>
+        <rect x="870" y="480" width="180" height="24" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="960" y="496" text-anchor="middle">it.standard</text>
+      </g>
+
+      <!-- Merge arrow -->
+      <rect x="380" y="600" width="320" height="46" rx="6" fill="#1F1F28" stroke="#00C9B0"/>
+      <text x="540" y="622" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="12">→ Schicht B: Kompetenz-Engine</text>
+      <text x="540" y="638" text-anchor="middle" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="10">mit ausgewähltem Adapter + 7-Stufen-Register</text>
+    </svg>
+    <div class="caption">Fig. 3 — Adapter-Selektor-Flow. Sub-Adapter-Detektion läuft vor der fachlichen Kompetenzprüfung.</div>
+  </div>
+
+  <h4>Pseudocode</h4>
+<pre class="codeblock">
+<span class="cm">// v0.5 Selektor-Algorithmus</span>
+<span class="kw">function</span> resolveAdapter(input):
+  country = detectCountry(input)
+  <span class="kw">switch</span> country:
+    <span class="kw">case</span> IT:
+      <span class="kw">if</span> isStatutoSpeciale(input.territorium):
+        <span class="kw">return</span> selectITSubAdapter(input.territorium)
+      <span class="kw">return</span> it_standard_adapter
+
+    <span class="kw">case</span> FR:
+      <span class="kw">if</span> isParis(input.territorium):        <span class="kw">return</span> fr_paris_adapter
+      <span class="kw">if</span> isLyonMetropole(input):           <span class="kw">return</span> fr_lyon_adapter
+      <span class="kw">if</span> isCorse(input.territorium):        <span class="kw">return</span> fr_corse_adapter
+      <span class="kw">if</span> isArt73(input.territorium):        <span class="kw">return</span> selectArt73SubAdapter(input)
+      <span class="kw">if</span> isArt74(input.territorium):        <span class="kw">return</span> selectArt74SubAdapter(input)
+      <span class="kw">if</span> input.level == <span class="st">"EPCI"</span>:
+        <span class="kw">return</span> selectFrEpciAdapter(input.epci_class)
+      <span class="kw">return</span> fr_standard_adapter
+
+    <span class="kw">case</span> DE: <span class="kw">return</span> de_adapter
+    <span class="kw">case</span> NL: <span class="kw">return</span> nl_adapter
+    <span class="kw">default</span>: <span class="kw">return</span> eu_horizontal_adapter
+</pre>
+</section>
+
+<!-- ============================================================ -->
+<section id="adapters">
+  <h2>Die 5 Adapter im Detail</h2>
+  <p class="lead">
+    Pro Adapter: rechtliche Basis, Schlüssel-Konzepte, Jurisprudenz-Trigger, Datenquellen, Sub-Adapter.
+  </p>
+
+  <div class="adapter-card de">
+    <h3>DE-Adapter</h3>
+    <div class="subtitle">Grundgesetz · LeiKa/FIM/XZuFi · Drei Ebenen + EU</div>
+    <p>Föderaler Staat mit enumerativen Bundeskompetenzen (Art. 73 GG) und Residualregel zugunsten der
+    Länder (Art. 30/70 GG). Kommunen über Art. 28 GG mit Allzuständigkeit.</p>
+
+    <details>
+      <summary>Schlüssel-Konzepte</summary>
+      <div class="body">
+        <p><strong>LeiKa-Typisierung 1–5:</strong> Kodiert Regelungs- vs. Vollzugskompetenz für über 2000
+        Verwaltungsleistungen.</p>
+        <ul>
+          <li>Typ 1 — Bund regelt + Bund vollzieht (Passwesen, Zoll)</li>
+          <li>Typ 2 — Bund regelt + Land vollzieht (Aufenthaltsrecht)</li>
+          <li>Typ 3 — Bund regelt + Kommune vollzieht (Meldewesen)</li>
+          <li>Typ 4 — Land regelt + Land/Kommune vollzieht (Schulpflicht)</li>
+          <li>Typ 5 — Kommune regelt + Kommune vollzieht (Hundesteuer)</li>
+        </ul>
+        <p><strong>XZuFi:</strong> XML-Standard für Zuständigkeitsfinder-Informationen (FITKO).</p>
+        <p><strong>Konkurrierende Gesetzgebung + Abweichungsrecht:</strong> Art. 72(3) GG als Sonderfall.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Stufe-3-Hook (transversale Durchbruchskompetenz)</summary>
+      <div class="body">
+        <p><strong>Art. 84 GG:</strong> Bundesaufsicht über Landesvollzug von Bundesgesetzen, inkl.
+        Weisungsrecht bei Gefahr im Verzug.</p>
+        <p><strong>Art. 85 GG:</strong> Bundesauftragsverwaltung — Länder führen im Auftrag des Bundes aus,
+        Bund kann fachliche Weisungen erteilen.</p>
+        <p><strong>Art. 72(3) GG:</strong> Abweichungsrecht der Länder bei bestimmten Materien —
+        Umkehrmechanismus.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Datenquellen</summary>
+      <div class="body">
+        <ul>
+          <li><code>LeiKa / FIM (FITKO)</code> — Leistungskatalog, Typisierung</li>
+          <li><code>XZuFi</code> — Zuständigkeitsfinder-XML</li>
+          <li><code>gesetze-im-internet.de</code> — XML-Export GG + Bundesgesetze</li>
+          <li><code>offenegesetze.de</code> — BGBl-REST</li>
+          <li><code>Berliner LOG</code> — kommunaler Datensatz (geplant Q3 2026)</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="adapter-card nl">
+    <h3>NL-Adapter</h3>
+    <div class="subtitle">Grondwet · Awb · bestuursorgaan · Vier Ebenen inkl. Waterschap</div>
+    <p>Verwaltungsrechtlich organisiertes System. Zuständigkeit folgt dem Konzept des <em>bestuursorgaan</em>
+    (Art. 1:1 Awb). Delegation braucht gesetzliche Grundlage.</p>
+
+    <details>
+      <summary>Schlüssel-Konzepte</summary>
+      <div class="body">
+        <p><strong>bestuursorgaan (Art. 1:1 Awb):</strong> Definiert wer Verwaltungshandlungen vornehmen kann.
+        Harte Regel: privatrechtliche Träger genügen nicht (RvS 07.02.2024, ECLI:NL:RVS:2024:470).</p>
+        <p><strong>Titel 10.1 Awb:</strong> Bündelt Mandat, Delegation, Attribution. Fehlt die
+        Delegationsgrundlage, ist die Delegation unverbindlich (RvS 17.12.2025, ECLI:NL:RVS:2025:6150).</p>
+        <p><strong>Vier-Ebenen-Territorialität:</strong> Rijk · Provincie · Gemeente · Waterschap
+        (eigenständig nach Art. 133 Grondwet).</p>
+        <p><strong>Wet gemeenschappelijke regelingen (WGR):</strong> interkörperschaftliche Kooperation in
+        vier Strukturformen.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Prozeduralpfad-Pflichten</summary>
+      <div class="body">
+        <ul>
+          <li><strong>Art. 2:3 Awb:</strong> Weiterleitung von Verwaltungsanträgen an zuständige Behörde</li>
+          <li><strong>Art. 6:15 Awb:</strong> Weiterleitung von Rechtsbehelfen unter Wahrung des Eingangs</li>
+          <li><strong>Art. 6:7 Awb:</strong> Sechswochenfrist für Widerspruch/Berufung</li>
+          <li><strong>Art. 4:13 Awb:</strong> Angemessene Entscheidungsfrist</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Datenquellen</summary>
+      <div class="body">
+        <ul>
+          <li><code>wetten.overheid.nl</code> — NL-Kern: konsolidierte Gesetze</li>
+          <li><code>kcbr.nl</code> — Aanwijzingen voor de regelgeving</li>
+          <li><code>rijksoverheid.nl/zbo's</code> — zbo-Registry</li>
+          <li><code>raadvanstate.nl</code> — ECLI-Rechtsprechung</li>
+          <li><code>waterschappen.nl</code> — 21 Waterschappen</li>
+          <li><code>VNG</code> — 342 Gemeinden + WGR-Strukturen</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="adapter-card eu">
+    <h3>EU-Adapter (horizontal)</h3>
+    <div class="subtitle">EUV · AEUV · Grundrechtecharta · Sektorale Spezialregime</div>
+    <p>Begrenzte Einzelermächtigung nach Art. 5 EUV. Nicht übertragene Kompetenzen bleiben Mitgliedstaaten.
+    Sektorale Spezialregime schlagen Grundmatrix.</p>
+
+    <details>
+      <summary>Horizontale Rechtsgrundlagen</summary>
+      <div class="body">
+        <ul>
+          <li><strong>Art. 5 EUV:</strong> Begrenzte Einzelermächtigung · Subsidiarität · Verhältnismäßigkeit</li>
+          <li><strong>Art. 3 AEUV:</strong> Ausschließliche Unionskompetenzen (Stufe 1)</li>
+          <li><strong>Art. 4 AEUV:</strong> Geteilte Kompetenzen mit Sperrwirkung</li>
+          <li><strong>Art. 6 AEUV:</strong> Unterstützende Kompetenzen ohne Harmonisierungsmacht</li>
+          <li><strong>Art. 288 AEUV:</strong> Rechtsakttypen (VO, RL, Beschluss, Empfehlung, Stellungnahme)</li>
+          <li><strong>Art. 291 AEUV:</strong> Durchführungsbefugnisse — Normalfall Mitgliedstaaten</li>
+          <li><strong>Art. 41 GRC:</strong> Recht auf gute Verwaltung (adressiert Unionsorgane)</li>
+          <li><strong>Art. 267 AEUV:</strong> Vorabentscheidungsverfahren</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Sektorale Override-Module</summary>
+      <div class="body">
+        <p><strong>DSGVO (Stufe 2):</strong> Art. 56 Lead Supervisory Authority · Art. 60 Kooperation ·
+        Art. 65 EDPB-Bindung · 4-Wochen-Frist für begründeten Einwand Art. 60(4).</p>
+        <p><strong>Wettbewerb (Stufe 2):</strong> VO 1/2003 + ECN · ~2-Monats-Reallocation ·
+        Art. 11(6) Verdrängungsregel.</p>
+        <p><strong>Binnenmarktkooperation (Stufe 2):</strong> IMI-Verordnung 1024/2012.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Agenturen und Basisrechtsakte</summary>
+      <div class="body">
+        <p>Agenturen handeln nur innerhalb ihres Basisrechtsakts — niemals als generelle Residualebene.
+        Delegationsschranken:</p>
+        <ul>
+          <li><strong>Meroni (9/56, 10/56):</strong> kein weites Ermessen an autonome Stellen</li>
+          <li><strong>Romano (98/80):</strong> keine Maßnahmen mit Gesetzeskraft außerhalb Vertragsrahmen</li>
+          <li><strong>ESMA (C-270/12):</strong> enge Delegation zulässig bei präziser Kontrolle</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="adapter-card fr">
+    <h3>FR-Adapter</h3>
+    <div class="subtitle">Constitution · CGCT · Blocs de compétences · 13 Sub-Adapter</div>
+    <p>Dezentralisierter Einheitsstaat. Keine lokale Gesetzgebung, nur <em>pouvoir réglementaire local</em>.
+    Post-loi-NOTRe 2015: Residualregel nur noch für Kommunen.</p>
+
+    <details>
+      <summary>Blocs de compétences (CGCT)</summary>
+      <div class="body">
+        <table>
+          <tr><th>Ebene</th><th>Pflichtbereiche</th></tr>
+          <tr><td>État</td><td>Justiz, Verteidigung, Außenpolitik, innere Sicherheit, nat. Curricula, staatl. Steuern</td></tr>
+          <tr><td>Région</td><td>Wirtschaftl. Entwicklung (SRDEII), Raumordnung (SRADDET), TER, Lycées, Berufsbildung</td></tr>
+          <tr><td>Département</td><td>RSA, Behindertenhilfe, Kinder/Senioren, SDIS, Collèges</td></tr>
+          <tr><td>Commune / EPCI</td><td>PLU, ÖPNV, Wasser/Abwasser, Abfall, Grundschulen, Standesamt</td></tr>
+        </table>
+      </div>
+    </details>
+
+    <details>
+      <summary>Sub-Adapter (13 gesamt)</summary>
+      <div class="body">
+        <p><strong>3 collectivités à statut particulier:</strong></p>
+        <ul>
+          <li><code>fr.paris</code> — Ville de Paris, Polizei-Sonderzweig (Art. L2512-1 ff. CGCT)</li>
+          <li><code>fr.lyon</code> — Métropole de Lyon, hybrid Commune+EPCI+Département (Art. L3611-1 CGCT)</li>
+          <li><code>fr.corse</code> — Collectivité de Corse, Vorschlagsrecht Assemblée (Art. L4421-1 CGCT)</li>
+        </ul>
+        <p><strong>Art. 73 Outre-mer (5 Einheiten, identité législative):</strong></p>
+        <ul>
+          <li><code>fr.art73.guadeloupe · .guyane · .martinique · .reunion · .mayotte</code></li>
+          <li>Drei Lockerungsinstrumente: Anpassung · Habilitation · Experiment</li>
+        </ul>
+        <p><strong>Art. 74 Outre-mer (5 Einheiten, spécialité législative):</strong></p>
+        <ul>
+          <li><code>fr.art74.saint_barthelemy · .saint_martin · .saint_pierre_miquelon · .wallis_futuna · .polynesie_francaise</code></li>
+          <li>Je eigenes organisches Statutsgesetz</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>EPCI-Klassen-Discriminator</summary>
+      <div class="body">
+        <table>
+          <tr><th>Klasse</th><th>Pflichtkern (CGCT-Art.)</th></tr>
+          <tr><td>Communauté de communes (CC)</td><td>L5214-16 — Raumordnung, Wirtschaft, GEMAPI, gens du voyage, Abfall</td></tr>
+          <tr><td>Communauté d'agglomération (CA)</td><td>L5216-5 — + Mobilität, sozialer Wohnungsbau, Stadtpolitik</td></tr>
+          <tr><td>Communauté urbaine (CU)</td><td>L5215-20 — + kollektive Dienste, Umwelt</td></tr>
+          <tr><td>Métropole (MET)</td><td>L5217-2 — sehr breit + konventionelle Übernahme staatl./dép./rég. Kompetenzen</td></tr>
+        </table>
+        <p>Sonderregime: Métropole du Grand Paris (eigenes Kompetenzregime). Métropole de Lyon = collectivité
+        à statut particulier, daher <code>fr.lyon</code> statt EPCI.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Jurisprudenz-Trigger</summary>
+      <div class="body">
+        <p><strong>Arcelor (CE 08.02.2007):</strong> EU-Recht unangewendet, wenn Verfassungsidentität verletzt
+        UND kein équivalent de protection.</p>
+        <p><strong>French Data Network (CE 21.04.2021):</strong> Ablehnung ultra-vires-Kontrolle;
+        gleichzeitig Arcelor-Aktivierung bei nationaler Sicherheit → Stufe-3-Override.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Datenquellen</summary>
+      <div class="body">
+        <ul>
+          <li><code>legifrance.gouv.fr</code> — FR-Kern: Constitution + CGCT + LODA</li>
+          <li><code>data.gouv.fr / Répertoire des services publics</code> — Service→Behörden</li>
+          <li><code>BANATIC</code> — EPCI-Zuordnung (Batch validiert, API offen)</li>
+          <li><code>collectivites-locales.gouv.fr</code> — DGCL-Integrationsstufen</li>
+          <li><code>Guide de légistique (SGG)</code> — Art. 73/74-Auslegung</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="adapter-card it">
+    <h3>IT-Adapter</h3>
+    <div class="subtitle">Costituzione · TUEL · Statuti Speciali · 7 Sub-Adapter</div>
+    <p>Asymmetrisch regionalisierter Staat. Art. 117 Cost. enumeriert staatliche Kompetenzen,
+    Residualregel zugunsten der Regionen. Materie trasversali als Stufe-3-Rechtfertigung.</p>
+
+    <details>
+      <summary>Art. 117 Cost. — Dreiteilung</summary>
+      <div class="body">
+        <table>
+          <tr><th>Typ</th><th>Akteur</th><th>Beispiele</th></tr>
+          <tr><td>Exklusiv (Abs. 2)</td><td>Stato</td><td>Außenpolitik, Verteidigung, Umwelt, Wettbewerb, LEP</td></tr>
+          <tr><td>Konkurrierend (Abs. 3)</td><td>Stato + Regioni</td><td>Gesundheit, Raumordnung, Energie — Staat Rahmen, Regionen detaillieren</td></tr>
+          <tr><td>Residual (Abs. 4)</td><td>Regioni</td><td>Tourismus, Berufsausbildung, lokales Handwerk</td></tr>
+        </table>
+        <p><strong>Invertierte Residualregel:</strong> Nicht enumerierte Materien fallen an die Regionen —
+        Umkehrung gegenüber DE (Art. 30/70 GG).</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Materie trasversali (Stufe-3-Rechtfertigung)</summary>
+      <div class="body">
+        <p>Die Corte Costituzionale hat festgestellt, dass bestimmte staatliche Exklusivkompetenzen
+        <em>finalistische Querschnittsziele</em> sind, die regional-exklusive Bereiche transversal durchbrechen:</p>
+        <ul>
+          <li><strong>Umweltschutz</strong> (Art. 117(2)(s)) — seit 2022 auch Art. 9, 41 Cost.</li>
+          <li><strong>Wettbewerbsschutz</strong></li>
+          <li><strong>LEP</strong> (Art. 117(2)(m)) — finanzielle/qualitative Mindeststandards</li>
+        </ul>
+        <p>Beispiel: Regionales Tourismusgesetz (Residualkompetenz) kann bei Berührung des landesweiten
+        Umweltschutzes durch den Staat überschrieben werden.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Sub-Adapter (7 gesamt — Regioni a statuto speciale)</summary>
+      <div class="body">
+        <ul>
+          <li><code>it.statuto.sicilia</code> — Statuto Art. 14 + Art. 17 + 2025er Finanznormen</li>
+          <li><code>it.statuto.sardegna</code> — Statuto Art. 3 + Arbeit/Arbeitsvermittlung-Durchführung</li>
+          <li><code>it.statuto.valle_daosta</code> — Statuto + regionale/kommunale Finanzordnung</li>
+          <li><code>it.statuto.friuli_venezia_giulia</code> — Statuto Art. 4 + 2026er Verfassungsgesetz (versioniert)</li>
+          <li><code>it.statuto.trentino.trento</code> — Autonome Provinz, Statuto Art. 8</li>
+          <li><code>it.statuto.trentino.bolzano</code> — Autonome Provinz, Statuto Art. 8</li>
+        </ul>
+        <p>Trentino-Alto Adige wird zusätzlich auf die Region-Hülle aufgelöst (Fassadenfunktion).</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>LEP/LEA-Mechanismus</summary>
+      <div class="body">
+        <p><strong>Art. 117(2)(m) Cost.:</strong> Staat legt Livelli Essenziali delle Prestazioni (LEP) für
+        bürgerliche/soziale Rechte landesweit fest.</p>
+        <p><strong>Gesundheitswesen:</strong> LEA (Livelli Essenziali di Assistenza) — Basis für
+        Standardkosten-Fixierung der Regionen.</p>
+        <p><strong>Engine-Konsequenz:</strong> Bei regionalen sozialen Diensten immer eine sekundäre
+        Zuständigkeit MEF/Parlament für LEP-Standardsetzung markieren.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Jurisprudenz-Trigger: Taricco + Sent. 269/2017</summary>
+      <div class="body">
+        <p><strong>Controlimiti-Doktrin (Granital 170/1984):</strong> EU-Vorrang anerkannt, aber Grenze in
+        principi supremi + unveräußerlichen Menschenrechten.</p>
+        <p><strong>Taricco-Saga:</strong></p>
+        <ul>
+          <li>Taricco I (C-105/14, 2015) — Verjährungs-Nichtanwendung bei Art.-325-AEUV-Verletzung</li>
+          <li>Ordinanza 24/2017 — Verjährung als materiell-rechtlich, controlimite</li>
+          <li>Taricco II (C-42/17, 2017) — EuGH-Rücknahme, Gesetzmäßigkeitsprinzip als Grenze</li>
+          <li>Sent. 115/2018 — Ende der Krise, Controlimiti bestätigt</li>
+        </ul>
+        <p><strong>Sent. 269/2017 — doppelte Präjudizialität:</strong> Bei GRC + Cost. parallel zuerst Corte
+        Costituzionale, dann ggf. EuGH. Zentralisierung der Normenkontrolle.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Datenquellen</summary>
+      <div class="body">
+        <ul>
+          <li><code>normattiva.it</code> — IT-Kern: Cost. + Statuti Speciali + Codici + Decreti</li>
+          <li><code>AgID Catalogo Nazionale dei Servizi</code> — CPSV-AP-IT-konform, RDF/JSON-LD</li>
+          <li><code>Indice PA (IPA)</code> — Authority Registry, CKAN-API (weitgehend validiert)</li>
+          <li><code>cortecostituzionale.it</code> — ECLI-Rechtsprechung</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="subadapter">
+  <h2>Sub-Adapter-Baum</h2>
+  <p class="lead">
+    17 Sub-Adapter verteilt auf zwei Länder. Jedes Blatt hat einen eigenen Normkorpus, nicht nur ein Flag.
+  </p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg">
+      <!-- Root -->
+      <rect x="470" y="20" width="160" height="36" rx="4" fill="#16161D" stroke="#00C9B0" stroke-width="1.5"/>
+      <text x="550" y="43" text-anchor="middle" fill="#E8E8E8" font-family="DM Mono, Menlo, monospace" font-size="13">Sub-Adapter</text>
+
+      <!-- FR branch -->
+      <rect x="150" y="110" width="120" height="36" rx="4" fill="#16161D" stroke="#C77DFF"/>
+      <text x="210" y="133" text-anchor="middle" fill="#C77DFF" font-family="DM Mono, Menlo, monospace" font-size="13">FR (13)</text>
+
+      <!-- IT branch -->
+      <rect x="830" y="110" width="120" height="36" rx="4" fill="#16161D" stroke="#FF6B6B"/>
+      <text x="890" y="133" text-anchor="middle" fill="#FF6B6B" font-family="DM Mono, Menlo, monospace" font-size="13">IT (7)</text>
+
+      <line x1="510" y1="56" x2="210" y2="108" stroke="#5A6068"/>
+      <line x1="590" y1="56" x2="890" y2="108" stroke="#5A6068"/>
+
+      <!-- FR: 3 classes -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="11" fill="#C77DFF">
+        <rect x="30" y="200" width="130" height="30" rx="3" fill="#1F1F28" stroke="#C77DFF"/>
+        <text x="95" y="220" text-anchor="middle">collectivités PS</text>
+        <rect x="170" y="200" width="130" height="30" rx="3" fill="#1F1F28" stroke="#C77DFF"/>
+        <text x="235" y="220" text-anchor="middle">Art. 73 (5)</text>
+        <rect x="310" y="200" width="130" height="30" rx="3" fill="#1F1F28" stroke="#C77DFF"/>
+        <text x="375" y="220" text-anchor="middle">Art. 74 (5)</text>
+
+        <line x1="140" y1="146" x2="95" y2="198" stroke="#5A6068"/>
+        <line x1="210" y1="146" x2="235" y2="198" stroke="#5A6068"/>
+        <line x1="230" y1="146" x2="375" y2="198" stroke="#5A6068"/>
+      </g>
+
+      <!-- collectivités PS leaves -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#E8E8E8">
+        <rect x="10" y="260" width="80" height="26" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="50" y="277" text-anchor="middle">Paris</text>
+        <rect x="95" y="260" width="80" height="26" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="135" y="277" text-anchor="middle">Lyon</text>
+        <rect x="10" y="292" width="165" height="26" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="92" y="309" text-anchor="middle">Corse</text>
+
+        <line x1="95" y1="230" x2="50" y2="258" stroke="#5A6068"/>
+        <line x1="95" y1="230" x2="135" y2="258" stroke="#5A6068"/>
+        <line x1="95" y1="230" x2="92" y2="290" stroke="#5A6068"/>
+      </g>
+
+      <!-- Art 73 leaves -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="9" fill="#E8E8E8">
+        <rect x="160" y="260" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="230" y="276" text-anchor="middle">Guadeloupe</text>
+        <rect x="160" y="290" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="230" y="306" text-anchor="middle">Guyane</text>
+        <rect x="160" y="320" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="230" y="336" text-anchor="middle">Martinique</text>
+        <rect x="160" y="350" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="230" y="366" text-anchor="middle">La Réunion</text>
+        <rect x="160" y="380" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="230" y="396" text-anchor="middle">Mayotte</text>
+
+        <line x1="235" y1="230" x2="230" y2="258" stroke="#5A6068"/>
+      </g>
+
+      <!-- Art 74 leaves -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="9" fill="#E8E8E8">
+        <rect x="310" y="260" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="380" y="276" text-anchor="middle">Saint-Barthélemy</text>
+        <rect x="310" y="290" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="380" y="306" text-anchor="middle">Saint-Martin</text>
+        <rect x="310" y="320" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="380" y="336" text-anchor="middle">Saint-Pierre-et-Miquelon</text>
+        <rect x="310" y="350" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="380" y="366" text-anchor="middle">Wallis-et-Futuna</text>
+        <rect x="310" y="380" width="140" height="24" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="380" y="396" text-anchor="middle">Polynésie française</text>
+
+        <line x1="375" y1="230" x2="380" y2="258" stroke="#5A6068"/>
+      </g>
+
+      <!-- EPCI as parallel branch (Klassendiscriminator, not Sub-Adapter im selben Sinn, aber wichtig) -->
+      <rect x="30" y="460" width="410" height="36" rx="4" fill="#16161D" stroke="#C77DFF" stroke-dasharray="4,3"/>
+      <text x="235" y="483" text-anchor="middle" fill="#C77DFF" font-family="DM Mono, Menlo, monospace" font-size="12">EPCI-Klassen (Discriminator, nicht Sub-Adapter)</text>
+
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#E8E8E8">
+        <rect x="30" y="510" width="90" height="26" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="75" y="527" text-anchor="middle">CC</text>
+        <rect x="125" y="510" width="90" height="26" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="170" y="527" text-anchor="middle">CA</text>
+        <rect x="220" y="510" width="90" height="26" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="265" y="527" text-anchor="middle">CU</text>
+        <rect x="315" y="510" width="125" height="26" rx="3" fill="#16161D" stroke="#C77DFF"/>
+        <text x="377" y="527" text-anchor="middle">MET (+Grand Paris)</text>
+      </g>
+
+      <!-- IT: Statuto Speciale -->
+      <rect x="800" y="200" width="180" height="30" rx="3" fill="#1F1F28" stroke="#FF6B6B"/>
+      <text x="890" y="220" text-anchor="middle" fill="#FF6B6B" font-family="DM Mono, Menlo, monospace" font-size="11">Regioni a statuto speciale</text>
+      <line x1="890" y1="146" x2="890" y2="198" stroke="#5A6068"/>
+
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#E8E8E8">
+        <rect x="700" y="260" width="160" height="26" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="780" y="277" text-anchor="middle">Sicilia</text>
+        <rect x="700" y="292" width="160" height="26" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="780" y="309" text-anchor="middle">Sardegna</text>
+        <rect x="700" y="324" width="160" height="26" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="780" y="341" text-anchor="middle">Valle d'Aosta</text>
+        <rect x="700" y="356" width="160" height="26" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="780" y="373" text-anchor="middle">Friuli-Venezia Giulia</text>
+
+        <rect x="900" y="260" width="180" height="26" rx="3" fill="#1F1F28" stroke="#FF6B6B" stroke-dasharray="3,2"/>
+        <text x="990" y="277" text-anchor="middle">Trentino-Alto Adige (Hülle)</text>
+        <rect x="900" y="292" width="180" height="26" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="990" y="309" text-anchor="middle">Trento (Provinz)</text>
+        <rect x="900" y="324" width="180" height="26" rx="3" fill="#16161D" stroke="#FF6B6B"/>
+        <text x="990" y="341" text-anchor="middle">Bolzano (Provinz)</text>
+
+        <line x1="890" y1="230" x2="780" y2="258" stroke="#5A6068"/>
+        <line x1="890" y1="230" x2="990" y2="258" stroke="#5A6068"/>
+      </g>
+
+      <!-- Legend -->
+      <g font-family="DM Mono, Menlo, monospace" font-size="10" fill="#5A6068">
+        <text x="550" y="600" text-anchor="middle">17 Sub-Adapter mit eigenem Normkorpus + 4 EPCI-Klassen + 1 Region-Hülle (TAA)</text>
+        <text x="550" y="620" text-anchor="middle">Jedes Blatt = eigenes versioniertes Regelwerk nach Normquelle und Geltungsdatum</text>
+        <text x="550" y="660" text-anchor="middle" fill="#00C9B0">Friuli-VG: 2026er Verfassungsgesetz · Sicilia: 2025er Finanznormen-Anpassung · Corse: seit 2018</text>
+      </g>
+    </svg>
+    <div class="caption">Fig. 4 — Sub-Adapter-Baum. FR links (13 Blätter), IT rechts (7 Blätter). EPCI-Klassen als Discriminator unterhalb.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="dimensions">
+  <h2>Vier-Dimensionen-Zerlegung</h2>
+  <p class="lead">
+    Jede Zuständigkeitsentscheidung wird in vier orthogonale Dimensionen zerlegt. Erst die Kombination
+    ergibt die zuständige Stelle. Die meisten Fehlzuordnungen entstehen aus Verwechslung dieser Achsen.
+  </p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg">
+      <!-- Cross lines -->
+      <line x1="450" y1="40" x2="450" y2="440" stroke="#2A2A33" stroke-width="1"/>
+      <line x1="50" y1="240" x2="850" y2="240" stroke="#2A2A33" stroke-width="1"/>
+
+      <!-- Territorial -->
+      <g>
+        <text x="250" y="70" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="14" letter-spacing="1.5">TERRITORIAL</text>
+        <text x="250" y="100" text-anchor="middle" fill="#E8E8E8" font-family="Inter, sans-serif" font-size="13">Welches Gebiet?</text>
+        <text x="250" y="130" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">DE: Bund · Land · Kreis · Gemeinde</text>
+        <text x="250" y="148" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">NL: Rijk · Provincie · Gemeente · Waterschap</text>
+        <text x="250" y="166" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">FR: État · Région · Département · Commune · EPCI</text>
+        <text x="250" y="184" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">IT: Stato · Regione · Provincia · Comune</text>
+        <text x="250" y="202" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">EU: Unionsdimension · Mitgliedstaatsvollzug</text>
+      </g>
+
+      <!-- Sachlich -->
+      <g>
+        <text x="650" y="70" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="14" letter-spacing="1.5">SACHLICH</text>
+        <text x="650" y="100" text-anchor="middle" fill="#E8E8E8" font-family="Inter, sans-serif" font-size="13">Welches Politik-/Regelungsfeld?</text>
+        <text x="650" y="130" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">EuroVoc-Normalisierung als Eingang</text>
+        <text x="650" y="148" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">DE: GG-Artikel + LeiKa-Zuordnung</text>
+        <text x="650" y="166" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">FR: CGCT-Bloc-Zuordnung</text>
+        <text x="650" y="184" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">IT: Art. 117 Cost. — 3 Klassen</text>
+        <text x="650" y="202" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">EU: Verträge + Basisrechtsakt</text>
+      </g>
+
+      <!-- Personell -->
+      <g>
+        <text x="250" y="290" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="14" letter-spacing="1.5">PERSONELL</text>
+        <text x="250" y="320" text-anchor="middle" fill="#E8E8E8" font-family="Inter, sans-serif" font-size="13">Welcher Adressatenkreis / Träger?</text>
+        <text x="250" y="350" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">NL: qualifiziert als bestuursorgaan?</text>
+        <text x="250" y="368" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">IT: Comune / Provincia / Regione (TUEL)</text>
+        <text x="250" y="386" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">FR: commune / EPCI-class / statut particulier?</text>
+        <text x="250" y="404" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">EU: Unternehmen · Controller · Aufsicht</text>
+      </g>
+
+      <!-- Funktional -->
+      <g>
+        <text x="650" y="290" text-anchor="middle" fill="#00C9B0" font-family="DM Mono, Menlo, monospace" font-size="14" letter-spacing="1.5">FUNKTIONAL</text>
+        <text x="650" y="320" text-anchor="middle" fill="#E8E8E8" font-family="Inter, sans-serif" font-size="13">Welche Handlungsform?</text>
+        <text x="650" y="350" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">Regelsetzung (Gesetz/Verordnung)</text>
+        <text x="650" y="368" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">Vollzug (Verwaltungsakt)</text>
+        <text x="650" y="386" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">Aufsicht · Koordination · Sanktion</text>
+        <text x="650" y="404" text-anchor="middle" fill="#C0C8D0" font-family="Inter, sans-serif" font-size="11">Rechtsschutz · Vorlage</text>
+      </g>
+
+      <!-- Center note -->
+      <circle cx="450" cy="240" r="6" fill="#00C9B0"/>
+      <text x="450" y="450" text-anchor="middle" fill="#5A6068" font-family="DM Mono, Menlo, monospace" font-size="10">Erst die Kombination ergibt die zuständige Stelle.</text>
+    </svg>
+    <div class="caption">Fig. 5 — Vier orthogonale Dimensionen. Beispiel FR: „Lärmschutz an Flughäfen" → Territorial (State+Région+Commune) · Sachlich (Umwelt+Verkehr) · Personell (État für nat. Standards, Préfecture für Genehmigung) · Funktional (Regelung+Vollzug+Sanktion).</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="jurisprudenz">
+  <h2>Rechtsprechung-Cross-Reference</h2>
+  <p class="lead">
+    Welche Entscheidung betrifft welchen Adapter und welche Override-Stufe? Produktionsrelevante
+    Grundlagenrechtsprechung konsolidiert.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Entscheidung</th>
+        <th>Adapter</th>
+        <th>Stufe</th>
+        <th>Engine-Relevanz</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Meroni (9/56, 10/56)</td>
+        <td>EU</td>
+        <td>4</td>
+        <td>Delegationsschranke gegen weites Ermessen</td>
+      </tr>
+      <tr>
+        <td>Romano (98/80)</td>
+        <td>EU</td>
+        <td>4</td>
+        <td>Keine Maßnahmen mit Gesetzeskraft außerhalb Vertragsrahmen</td>
+      </tr>
+      <tr>
+        <td>ESMA (C-270/12, 2014)</td>
+        <td>EU</td>
+        <td>5</td>
+        <td>Agenturdelegation zulässig bei präziser Kontrolle</td>
+      </tr>
+      <tr>
+        <td>Tobacco Advertising (C-376/98)</td>
+        <td>EU</td>
+        <td>1</td>
+        <td>Art. 114 AEUV kein Blankoscheck</td>
+      </tr>
+      <tr>
+        <td>Facebook Ireland (C-645/19, 2021)</td>
+        <td>EU</td>
+        <td>2</td>
+        <td>DSGVO one-stop-shop als Regel, CSA-Ausnahmen</td>
+      </tr>
+      <tr>
+        <td>CILFIT</td>
+        <td>EU</td>
+        <td>7</td>
+        <td>Vorlagepflicht letztinstanzlich</td>
+      </tr>
+      <tr>
+        <td>Foto-Frost</td>
+        <td>EU</td>
+        <td>7</td>
+        <td>Nationale Gerichte erklären Unionsakte nicht ungültig</td>
+      </tr>
+      <tr>
+        <td>RvS 07.02.2024 (2024:470)</td>
+        <td>NL</td>
+        <td>4</td>
+        <td>bestuursorgaan-Qualifikation: privatrechtliche Form genügt nicht</td>
+      </tr>
+      <tr>
+        <td>RvS 17.12.2025 (2025:6150)</td>
+        <td>NL</td>
+        <td>5</td>
+        <td>Delegation ohne gesetzliche Grundlage unverbindlich</td>
+      </tr>
+      <tr>
+        <td>Arcelor (CE 08.02.2007)</td>
+        <td>FR</td>
+        <td>3 + 7</td>
+        <td>Verfassungsidentität + équivalence-Prüfung</td>
+      </tr>
+      <tr>
+        <td>French Data Network (CE 21.04.2021)</td>
+        <td>FR</td>
+        <td>3</td>
+        <td>Nationale Sicherheit als Stufe-3-Trigger; ultra-vires-Kontrolle abgelehnt</td>
+      </tr>
+      <tr>
+        <td>Granital (Corte Cost. 170/1984)</td>
+        <td>IT</td>
+        <td>7</td>
+        <td>EU-Vorrang mit Controlimiti-Vorbehalt</td>
+      </tr>
+      <tr>
+        <td>Taricco I (C-105/14, 2015)</td>
+        <td>EU↔IT</td>
+        <td>1</td>
+        <td>Art. 325 AEUV — Verjährungs-Nichtanwendung</td>
+      </tr>
+      <tr>
+        <td>Corte Cost. Ordinanza 24/2017</td>
+        <td>IT</td>
+        <td>7</td>
+        <td>Verjährung als controlimite → EuGH-Vorlage</td>
+      </tr>
+      <tr>
+        <td>Taricco II (C-42/17, 2017)</td>
+        <td>EU↔IT</td>
+        <td>7</td>
+        <td>EuGH-Rücknahme, Gesetzmäßigkeitsprinzip als Grenze</td>
+      </tr>
+      <tr>
+        <td>Corte Cost. 115/2018</td>
+        <td>IT</td>
+        <td>7</td>
+        <td>Ende der Taricco-Krise, Controlimiti bestätigt</td>
+      </tr>
+      <tr>
+        <td>Corte Cost. 269/2017</td>
+        <td>IT</td>
+        <td>7</td>
+        <td>Doppelte Präjudizialität: Corte Cost. vor EuGH bei GRC + Cost.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="datenquellen">
+  <h2>Datenquellen-Matrix (konsolidiert v0.3–v0.5)</h2>
+  <p class="lead">
+    Alle validierten Quellen quer über alle Adapter. Status-Spalte ist ehrlich kalibriert: "produktiv",
+    "teilvalidiert", "Quoten offen" bedeuten unterschiedliche Produktionsreife.
+  </p>
+
+  <details open>
+    <summary><span class="label-tag de">DE</span> LeiKa · XZuFi · gesetze-im-internet</summary>
+    <div class="body">
+      <table>
+        <tr><th>Quelle</th><th>Format</th><th>Status</th></tr>
+        <tr><td>LeiKa / FIM (FITKO)</td><td>XML/API</td><td>produktiv</td></tr>
+        <tr><td>XZuFi</td><td>XML</td><td>produktiv</td></tr>
+        <tr><td>gesetze-im-internet.de</td><td>XML</td><td>produktiv</td></tr>
+        <tr><td>offenegesetze.de</td><td>JSON REST</td><td>produktiv</td></tr>
+        <tr><td>DIP-Bundestag</td><td>JSON REST</td><td>produktiv</td></tr>
+        <tr><td>NeuRIS</td><td>TBD</td><td>Testphase, Q3 2026 geplant</td></tr>
+        <tr><td>Berliner LOG</td><td>TBD</td><td>geplant Q3 2026</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag nl">NL</span> wetten.overheid · kcbr · raadvanstate</summary>
+    <div class="body">
+      <table>
+        <tr><th>Quelle</th><th>Format</th><th>Status</th></tr>
+        <tr><td>wetten.overheid.nl</td><td>XML/HTML</td><td>produktiv</td></tr>
+        <tr><td>kcbr.nl (Aanwijzingen)</td><td>HTML</td><td>produktiv</td></tr>
+        <tr><td>rijksoverheid.nl/zbo's</td><td>HTML</td><td>produktiv</td></tr>
+        <tr><td>raadvanstate.nl (ECLI)</td><td>HTML</td><td>produktiv</td></tr>
+        <tr><td>waterschappen.nl</td><td>HTML/CSV</td><td>produktiv</td></tr>
+        <tr><td>VNG Gemeenten</td><td>API/CSV</td><td>produktiv</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag eu">EU</span> CELLAR · CURIA · EDPB · ECN · IMI</summary>
+    <div class="body">
+      <table>
+        <tr><th>Quelle</th><th>Format</th><th>Status</th></tr>
+        <tr><td>EUR-Lex CELLAR</td><td>SPARQL</td><td>produktiv</td></tr>
+        <tr><td>CURIA Case-Law</td><td>ECLI/HTML</td><td>produktiv</td></tr>
+        <tr><td>edpb.europa.eu</td><td>HTML/PDF</td><td>produktiv</td></tr>
+        <tr><td>ec.europa.eu/competition (ECN)</td><td>HTML</td><td>produktiv</td></tr>
+        <tr><td>IMI-Register (VO 1024/2012)</td><td>API (beschränkt)</td><td>teilvalidiert</td></tr>
+        <tr><td>european-union.europa.eu/agencies</td><td>HTML</td><td>produktiv</td></tr>
+        <tr><td>Wikidata P1001</td><td>SPARQL</td><td>produktiv (Cross-Level-Kleber)</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag fr">FR</span> Legifrance · BANATIC · DGCL</summary>
+    <div class="body">
+      <table>
+        <tr><th>Quelle</th><th>Format</th><th>Status</th></tr>
+        <tr><td>legifrance.gouv.fr (CGCT)</td><td>JSON/XML</td><td>produktiv</td></tr>
+        <tr><td>data.gouv.fr / Répertoire des services publics</td><td>JSON/CSV</td><td>produktiv</td></tr>
+        <tr><td>BANATIC</td><td>CSV/XLSX (Batch)</td><td>Batch validiert, API offen</td></tr>
+        <tr><td>collectivites-locales.gouv.fr (DGCL)</td><td>HTML</td><td>produktiv</td></tr>
+        <tr><td>Guide de légistique (SGG)</td><td>HTML/PDF</td><td>produktiv</td></tr>
+        <tr><td>Conseil d'État / Legifrance-CE</td><td>ECLI/HTML</td><td>produktiv</td></tr>
+      </table>
+      <p><strong>Warnung BANATIC:</strong> Aktualisierungsfrequenz laut data.gouv.fr nicht eingehalten.
+      Als periodische Dateiquelle nutzen, nicht als Echtzeit-Abfrage.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="label-tag it">IT</span> Normattiva · AgID · Indice PA · Corte Cost.</summary>
+    <div class="body">
+      <table>
+        <tr><th>Quelle</th><th>Format</th><th>Status</th></tr>
+        <tr><td>normattiva.it</td><td>HTML/URN-NIR</td><td>produktiv</td></tr>
+        <tr><td>AgID Catalogo Nazionale dei Servizi</td><td>RDF/JSON-LD (CPSV-AP-IT)</td><td>produktiv</td></tr>
+        <tr><td>Indice PA (IPA)</td><td>TXT/XLSX + CKAN-API</td><td>weitgehend validiert, Quoten offen</td></tr>
+        <tr><td>cortecostituzionale.it</td><td>ECLI/HTML</td><td>produktiv</td></tr>
+        <tr><td>Curia (Taricco-Fälle)</td><td>ECLI/HTML</td><td>produktiv</td></tr>
+      </table>
+      <p><strong>Warnung Indice PA:</strong> Dokumentationsinkonsistenz zwischen Manuale ("SPARQL") und
+      tatsächlichen CKAN-Endpunkten (<code>datastore_search</code>, <code>datastore_search_sql</code>).
+      Contract-Test vor Produktion empfohlen.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<section id="eurovoc">
+  <h2>EuroVoc-Mapping-Beispiele</h2>
+  <p class="lead">
+    Schicht A normalisiert Freitext auf EuroVoc-Deskriptoren. Die eigentliche Zuordnung zur
+    nationalen Kompetenzebene erfolgt über pro-Land-Mapping-Tabellen — die explizit gebaut werden
+    müssen, weil EuroVoc nicht mit nationalen Rechtsgebieten aligned ist.
+  </p>
+
+  <details open>
+    <summary>Beispiel 1: EuroVoc <code>1614</code> „regional development"</summary>
+    <div class="body">
+      <table>
+        <tr><th>Adapter</th><th>Mapping-Ziel</th><th>Engine-Output</th></tr>
+        <tr><td>DE</td><td>GG Art. 74 (konkurrierend) + Länder-Landesplanung</td><td>primary: Bund+Land, shared</td></tr>
+        <tr><td>NL</td><td>Provinciewet + Omgevingswet</td><td>primary: Provincie, secondary: Rijk (Rahmen)</td></tr>
+        <tr><td>FR</td><td>CGCT Région (SRDEII, SRADDET)</td><td>primary: Région</td></tr>
+        <tr><td>IT</td><td>Art. 117 Abs. 3 (konkurrierend)</td><td>primary: Regione, secondary: Stato (Rahmen)</td></tr>
+        <tr><td>EU</td><td>Art. 175 AEUV (Kohäsionspolitik)</td><td>mitwirkend: EFRE-Strukturfonds</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>Beispiel 2: EuroVoc <code>4293</code> „social protection"</summary>
+    <div class="body">
+      <table>
+        <tr><th>Adapter</th><th>Mapping-Ziel</th><th>Engine-Output</th></tr>
+        <tr><td>DE</td><td>GG Art. 74 Nr. 7 (öffentliche Fürsorge) + SGB-Regelwerke</td><td>primary: Bund, Vollzug Kreis/Gemeinde (LeiKa Typ 2/3)</td></tr>
+        <tr><td>NL</td><td>Participatiewet + Gemeentewet</td><td>primary: Gemeente, mitwirkend: Rijk (medebewind, Stufe 3)</td></tr>
+        <tr><td>FR</td><td>CGCT Département — RSA, Behindertenhilfe</td><td>primary: Département (chef de file)</td></tr>
+        <tr><td>IT</td><td>Art. 117 Abs. 4 regional + LEP durch Stato</td><td>primary: Regione, secondary: Stato (LEP, Stufe 3)</td></tr>
+        <tr><td>EU</td><td>Art. 153 AEUV (unterstützend)</td><td>mitwirkend: ESF</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>Beispiel 3: EuroVoc <code>1600</code> „waste management"</summary>
+    <div class="body">
+      <table>
+        <tr><th>Adapter</th><th>Mapping-Ziel</th><th>Engine-Output</th></tr>
+        <tr><td>DE</td><td>KrWG + Landes-Abfallrecht</td><td>primary: Bund (Rahmen), Vollzug Kreis</td></tr>
+        <tr><td>NL</td><td>Wet milieubeheer + Gemeentewet</td><td>primary: Gemeente, secondary: Rijk (Rahmen)</td></tr>
+        <tr><td>FR</td><td>CGCT L5214-16 — EPCI-Pflichtkern, aber CC/CA/CU/MET unterschiedlich</td><td>primary: EPCI (je nach Klasse)</td></tr>
+        <tr><td>IT</td><td>TUEL Art. 13 + D.Lgs. 152/2006</td><td>primary: Comune, Rahmen Regione</td></tr>
+        <tr><td>EU</td><td>Abfallrahmenrichtlinie 2008/98/EG</td><td>secondary: EU (Rahmen, Stufe 2 konkurrierend)</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>Beispiel 4: EuroVoc <code>231611</code> „artificial intelligence"</summary>
+    <div class="body">
+      <table>
+        <tr><th>Adapter</th><th>Mapping-Ziel</th><th>Engine-Output</th></tr>
+        <tr><td>EU</td><td>AI Act (VO 2024/1689)</td><td>primary: EU (Stufe 1, Binnenmarkt)</td></tr>
+        <tr><td>DE</td><td>Nationale AI-Marktüberwachungsbehörde (im Aufbau)</td><td>mitwirkend: BNetzA + LDAs (Vollzug)</td></tr>
+        <tr><td>NL</td><td>Nationale Implementation AI Act</td><td>mitwirkend: nat. Aufsichtsbehörde + AP (DSGVO)</td></tr>
+        <tr><td>FR</td><td>CNIL + nat. AI-Marktüberwachung</td><td>mitwirkend: Vollzug</td></tr>
+        <tr><td>IT</td><td>AgID + Garante Privacy</td><td>mitwirkend: Vollzug</td></tr>
+      </table>
+      <p><strong>Besonderheit:</strong> Reine EU-Kompetenz auf Regelsetzungsebene. Nationaler Adapter
+      markiert nur mitwirkende Behörden für Marktüberwachung und Sanktionen.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Beispiel 5: EuroVoc <code>2451</code> „data protection"</summary>
+    <div class="body">
+      <table>
+        <tr><th>Adapter</th><th>Mapping-Ziel</th><th>Engine-Output</th></tr>
+        <tr><td>EU</td><td>DSGVO (VO 2016/679) + one-stop-shop (Stufe 2)</td><td>primary: Lead Supervisory Authority</td></tr>
+        <tr><td>DE</td><td>BDSG + LDSG</td><td>mitwirkend: BfDI + 16 LDAs (CSA)</td></tr>
+        <tr><td>NL</td><td>UAVG</td><td>mitwirkend: AP (CSA)</td></tr>
+        <tr><td>FR</td><td>Loi Informatique et Libertés</td><td>mitwirkend: CNIL</td></tr>
+        <tr><td>IT</td><td>Codice Privacy + Sent. 269/2017 bei Grundrechts-Konflikt</td><td>mitwirkend: Garante Privacy; bei GRC+Cost.: Eskalation Corte Cost.</td></tr>
+      </table>
+      <p><strong>Cross-Adapter:</strong> Stufe 2 (DSGVO-Mechanismus) verdrängt Stufe 4 (nationale
+      Spezialzuständigkeiten). IT-Adapter aktiviert bei grundrechtsrelevanten Verarbeitungen zusätzlich
+      Stufe-7-Pfad über Sent. 269/2017.</p>
+    </div>
+  </details>
+</section>
+
+</main>
+
+<footer class="final">
+  DeineStimme.org · Zuständigkeits-Engine · Mapping-Dokument v0.5 · 19.04.2026<br>
+  Basis: Spec v0.5 (FR/IT-Erweiterung) · Spec v0.4 (NL/EU) · Spec v0.3 (DE) · Addendum v0.3<br>
+  AGPL-3.0 · Strauss &amp; Reinemann GbR
+</footer>
+
+</body>
+</html>

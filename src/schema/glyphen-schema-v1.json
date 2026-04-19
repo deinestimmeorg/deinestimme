@@ -1,0 +1,227 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Glyphen Notation Schema v1.0",
+  "description": "Parsing schema for the Glyphen contract analysis engine",
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-18",
+
+  "glyphs": {
+    "core": {
+      "aneignung": {
+        "symbol": "⊃",
+        "unicode": "U+2283",
+        "codepoint": 8835,
+        "kasus": "illativ",
+        "direction": "inward",
+        "description": "Aufnahme, Hän innerhalb der D-Form"
+      },
+      "transformation": {
+        "symbol": "⏀",
+        "unicode": "U+23C0",
+        "codepoint": 9152,
+        "kasus": null,
+        "direction": "throughput",
+        "description": "Hän, Grundoperation",
+        "isImplicitInCompactMode": true
+      },
+      "abgabe": {
+        "symbol": "⋙",
+        "unicode": "U+22D9",
+        "codepoint": 8921,
+        "kasus": "elativ",
+        "direction": "outward",
+        "description": "Radiale Emission, Aufmerksamkeit, Abgabe",
+        "aliases": ["aufmerksamkeit"]
+      },
+      "stasis": {
+        "symbol": "⊛",
+        "unicode": "U+229B",
+        "codepoint": 8859,
+        "kasus": "inessiv",
+        "direction": "contained",
+        "description": "Erhalt, Hän im geschlossenen Kreis",
+        "aliases": ["erhalt"]
+      },
+      "erschaffung": {
+        "symbol": "⏀",
+        "requiresEbene": true,
+        "description": "Hän + Ebene; keine eigenständige Glyphe"
+      }
+    },
+    "modifications": {
+      "potenzial": {
+        "symbol": "⌯",
+        "unicode": "U+232F",
+        "codepoint": 9007,
+        "description": "In Schwebe, noch nicht materialisiert",
+        "aliases": ["plan"]
+      },
+      "transport": {
+        "symbol": "⏀⊥",
+        "sequence": ["U+23C0", "U+22A5"],
+        "codepoints": [9152, 8869],
+        "description": "Hän bewegt abgeschlossenes Material"
+      }
+    }
+  },
+
+  "ebenen": {
+    "material": {
+      "symbol": "⚒",
+      "unicode": "U+2692",
+      "codepoint": 9874,
+      "connotation": "Rohstoff, physische Substanz"
+    },
+    "vertrag": {
+      "symbol": "§",
+      "unicode": "U+00A7",
+      "codepoint": 167,
+      "connotation": "Recht, vertragliche Bindung"
+    },
+    "lenkung": {
+      "symbol": "⎈",
+      "unicode": "U+2388",
+      "codepoint": 9096,
+      "connotation": "Steuerung, Governance"
+    },
+    "eigentum": {
+      "symbol": "⌂",
+      "unicode": "U+2302",
+      "codepoint": 8962,
+      "connotation": "Besitz, Zugehörigkeit"
+    },
+    "narrativ": {
+      "symbol": "¶",
+      "unicode": "U+00B6",
+      "codepoint": 182,
+      "connotation": "Erzählung, Rahmung, Text"
+    },
+    "kapital": {
+      "symbol": "¤",
+      "unicode": "U+00A4",
+      "codepoint": 164,
+      "connotation": "Wertfluss, generische Währung"
+    }
+  },
+
+  "operators": {
+    "fliessend": {
+      "symbol": "/",
+      "unicode": "U+002F",
+      "state": "laufend",
+      "description": "Energie fließt, in Transformation"
+    },
+    "abgeschlossen": {
+      "symbol": "⊥",
+      "unicode": "U+22A5",
+      "state": "abgeschlossen",
+      "description": "Fertig, nicht mehr in Bewegung"
+    }
+  },
+
+  "tripleStructure": {
+    "description": "Jeder analysierte Satz wird als Tripel kodiert",
+    "format": "{quelle}{operator?}{ziel}{ebene}",
+    "fields": {
+      "quelle": {
+        "type": "string",
+        "description": "Akteur, der die Energiebewegung initiiert",
+        "required": true
+      },
+      "glyph": {
+        "type": "enum",
+        "values": ["aneignung", "transformation", "abgabe", "stasis", "erschaffung"],
+        "required": true
+      },
+      "ziel": {
+        "type": "string",
+        "description": "Objekt/Empfänger der Energiebewegung",
+        "required": false
+      },
+      "ebene": {
+        "type": "enum",
+        "values": ["material", "vertrag", "lenkung", "eigentum", "narrativ", "kapital"],
+        "required": true
+      },
+      "flussZustand": {
+        "type": "enum",
+        "values": ["fliessend", "abgeschlossen"],
+        "default": "fliessend"
+      }
+    }
+  },
+
+  "renderingModes": {
+    "kompakt": {
+      "description": "Menschliche Lesung, Fließtext, UI-Labels",
+      "haenImplicit": true,
+      "example": "Der Lizenznehmer ⊃⌂ die Nutzungsrechte."
+    },
+    "formal": {
+      "description": "Engine-Output, Logs, API, wissenschaftliche Darstellung",
+      "haenImplicit": false,
+      "example": "Der Lizenznehmer ⏀⊃⌂ die Nutzungsrechte."
+    }
+  },
+
+  "machtIndexHints": {
+    "description": "Dimensionen zur MI-Berechnung auf Tripel-Basis",
+    "dimensions": {
+      "ebenenVerteilung": "Wie symmetrisch sind die Ebenen-Flüsse zwischen den Parteien?",
+      "flussRichtung": "Überwiegen Illativ (⊃) oder Elativ (⋙) bei einer Partei?",
+      "stasisDominanz": "Eine Partei hält (⊛), die andere fließt? Asymmetrie-Indikator.",
+      "erschaffungsAttribution": "Wer erschafft auf welchen Ebenen?"
+    }
+  },
+
+  "examples": [
+    {
+      "klartext": "Lizenznehmer erwirbt Nutzungsrechte",
+      "kompakt": "⊃⌂",
+      "formal": "⏀⊃⌂",
+      "tripel": {
+        "quelle": "Lizenznehmer",
+        "glyph": "aneignung",
+        "ziel": "Nutzungsrechte",
+        "ebene": "eigentum",
+        "flussZustand": "abgeschlossen"
+      }
+    },
+    {
+      "klartext": "Mieter zahlt jährlich Miete",
+      "kompakt": "⋙¤",
+      "formal": "⏀⋙¤",
+      "tripel": {
+        "quelle": "Mieter",
+        "glyph": "abgabe",
+        "ziel": "Miete",
+        "ebene": "kapital",
+        "flussZustand": "fliessend"
+      }
+    },
+    {
+      "klartext": "Plattform archiviert den Vertrag",
+      "kompakt": "⊛§",
+      "formal": "⏀⊛§",
+      "tripel": {
+        "quelle": "Plattform",
+        "glyph": "stasis",
+        "ziel": "Vertrag",
+        "ebene": "vertrag",
+        "flussZustand": "abgeschlossen"
+      }
+    },
+    {
+      "klartext": "Die Fabrik fertigt Turbinen",
+      "kompakt": "⏀⚒",
+      "formal": "⏀⚒",
+      "tripel": {
+        "quelle": "Fabrik",
+        "glyph": "erschaffung",
+        "ziel": "Turbinen",
+        "ebene": "material",
+        "flussZustand": "fliessend"
+      }
+    }
+  ]
+}

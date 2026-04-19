@@ -1,0 +1,316 @@
+// i18n strings for the in-app Zuständigkeits-Engine preview + tab.
+// Engine search itself remains German-language for now (LeiKa/GG are DE-only).
+// UI labels translate to DE/EN/NL/FR/ES/ID.
+
+export const zustI18n = {
+  de: {
+    testBanner:
+      "TEST · In der Live-Version wird die Zuständigkeit erst beim Erreichen der Vorschlags-Reife angezeigt, mit Weiterleitungs- und Feedback-Funktion.",
+    dismissAria: "Hinweis schließen",
+    previewTitle: "Zuständigkeit (live)",
+    waiting: "Beginne zu schreiben — die Zuständigkeitsprüfung läuft automatisch.",
+    noMatch:
+      "Kein klares Thema erkannt. Gib ein konkretes Politikfeld ein (z. B. Strompreise, Schule, Asyl, Müll).",
+    primaryLabel: "Primäre Ebene",
+    secondaryLabel: "Auch betroffen",
+    confidenceLabel: "Vertrauen",
+    competenceLabel: "Kompetenzart",
+    matchLabel: "Erkanntes Thema",
+    showDetails: "Details",
+    hideDetails: "weniger",
+    searchLanguageHint:
+      "Sucheingabe bitte auf Deutsch — Erweiterung für andere Sprachen folgt in Phase 2.",
+    tabLabel: "Zuständigkeit",
+    tabPageTitle: "Zuständigkeits-Navigation",
+    tabPageSub:
+      "Wer entscheidet über was? Thema eingeben, Ebene + Vertrauen sehen, passende EU-Kanäle ansehen.",
+    tabInputPlaceholder: "Thema eingeben… z. B. Strompreise, Hundesteuer, Kita",
+    tabFullPageLink: "Vollständige Ansicht öffnen →",
+    tabExamples: "Beispiele",
+    levels: {
+      EU: "EU",
+      Bund: "Bund",
+      Land: "Land",
+      Kreis: "Kreis",
+      Kommune: "Kommune",
+    },
+    competence: {
+      ausschliesslich_bund: "Bund — ausschließlich",
+      konkurrierend: "Bund/Land — konkurrierend",
+      abweichungsrecht: "Bund/Land — Abweichungsrecht",
+      rahmen: "Bund — Rahmen",
+      laender_ausschliesslich: "Land — ausschließlich",
+      kommunal: "Kommunale Selbstverwaltung",
+      exclusive: "EU — ausschließlich",
+      shared: "EU/Bund — geteilt",
+      shared_parallel: "EU/Bund — parallel",
+      coordinating: "EU — koordinierend",
+      supporting: "EU — unterstützend",
+      cfsp: "GASP",
+      residual: "Residual (Art. 30 GG)",
+      not_classified: "Nicht klassifiziert",
+    },
+  },
+
+  en: {
+    testBanner:
+      "TEST · In the live version, jurisdiction will only appear once the proposal reaches maturity, together with forwarding and feedback.",
+    dismissAria: "Dismiss notice",
+    previewTitle: "Jurisdiction (live)",
+    waiting: "Start typing — the jurisdiction check runs automatically.",
+    noMatch:
+      "No clear topic detected. Enter a concrete policy term (e.g. electricity prices, school, asylum, waste).",
+    primaryLabel: "Primary level",
+    secondaryLabel: "Also affected",
+    confidenceLabel: "Confidence",
+    competenceLabel: "Competence type",
+    matchLabel: "Detected topic",
+    showDetails: "Details",
+    hideDetails: "less",
+    searchLanguageHint:
+      "Please enter search terms in German for now — other languages follow in phase 2.",
+    tabLabel: "Jurisdiction",
+    tabPageTitle: "Jurisdiction navigation",
+    tabPageSub:
+      "Who decides what? Enter a topic, see level + confidence, find matching EU channels.",
+    tabInputPlaceholder: "Enter topic… e.g. electricity prices, dog tax, daycare",
+    tabFullPageLink: "Open full view →",
+    tabExamples: "Examples",
+    levels: {
+      EU: "EU",
+      Bund: "Federal",
+      Land: "State",
+      Kreis: "District",
+      Kommune: "Municipality",
+    },
+    competence: {
+      ausschliesslich_bund: "Federal — exclusive",
+      konkurrierend: "Federal/State — concurrent",
+      abweichungsrecht: "Federal/State — deviation right",
+      rahmen: "Federal — framework",
+      laender_ausschliesslich: "State — exclusive",
+      kommunal: "Municipal self-government",
+      exclusive: "EU — exclusive",
+      shared: "EU/Member State — shared",
+      shared_parallel: "EU/Member State — parallel",
+      coordinating: "EU — coordinating",
+      supporting: "EU — supporting",
+      cfsp: "CFSP",
+      residual: "Residual (Art. 30 Basic Law)",
+      not_classified: "Not classified",
+    },
+  },
+
+  nl: {
+    testBanner:
+      "TEST · In de live-versie verschijnt de bevoegdheid pas wanneer het voorstel rijp is, samen met doorverwijzing en feedback.",
+    dismissAria: "Melding sluiten",
+    previewTitle: "Bevoegdheid (live)",
+    waiting: "Begin te typen — de bevoegdheidscontrole loopt automatisch.",
+    noMatch:
+      "Geen duidelijk onderwerp herkend. Voer een concreet beleidsveld in (bv. stroomprijzen, school, asiel, afval).",
+    primaryLabel: "Primair niveau",
+    secondaryLabel: "Ook betrokken",
+    confidenceLabel: "Vertrouwen",
+    competenceLabel: "Bevoegdheidstype",
+    matchLabel: "Herkend onderwerp",
+    showDetails: "Details",
+    hideDetails: "minder",
+    searchLanguageHint:
+      "Zoektermen voorlopig in het Duits invoeren — uitbreiding naar andere talen volgt in fase 2.",
+    tabLabel: "Bevoegdheid",
+    tabPageTitle: "Bevoegdheidsnavigatie",
+    tabPageSub:
+      "Wie beslist waarover? Onderwerp invoeren, niveau + vertrouwen zien, passende EU-kanalen vinden.",
+    tabInputPlaceholder: "Onderwerp invoeren… bv. stroomprijzen, hondenbelasting, kinderopvang",
+    tabFullPageLink: "Volledige weergave openen →",
+    tabExamples: "Voorbeelden",
+    levels: {
+      EU: "EU",
+      Bund: "Federaal",
+      Land: "Deelstaat",
+      Kreis: "District",
+      Kommune: "Gemeente",
+    },
+    competence: {
+      ausschliesslich_bund: "Federaal — exclusief",
+      konkurrierend: "Federaal/Deelstaat — concurrerend",
+      abweichungsrecht: "Federaal/Deelstaat — afwijkingsrecht",
+      rahmen: "Federaal — kader",
+      laender_ausschliesslich: "Deelstaat — exclusief",
+      kommunal: "Gemeentelijk zelfbestuur",
+      exclusive: "EU — exclusief",
+      shared: "EU/Lidstaat — gedeeld",
+      shared_parallel: "EU/Lidstaat — parallel",
+      coordinating: "EU — coördinerend",
+      supporting: "EU — ondersteunend",
+      cfsp: "GBVB",
+      residual: "Residueel (Art. 30 GG)",
+      not_classified: "Niet geclassificeerd",
+    },
+  },
+
+  fr: {
+    testBanner:
+      "TEST · Dans la version finale, la compétence ne s'affichera que lorsque la proposition aura atteint sa maturité, avec transfert et retour.",
+    dismissAria: "Fermer l'avis",
+    previewTitle: "Compétence (en direct)",
+    waiting: "Commencez à écrire — la vérification de compétence s'effectue automatiquement.",
+    noMatch:
+      "Aucun sujet clair détecté. Saisissez un domaine politique concret (p. ex. prix de l'électricité, école, asile, déchets).",
+    primaryLabel: "Niveau principal",
+    secondaryLabel: "Également concerné",
+    confidenceLabel: "Confiance",
+    competenceLabel: "Type de compétence",
+    matchLabel: "Sujet détecté",
+    showDetails: "Détails",
+    hideDetails: "moins",
+    searchLanguageHint:
+      "Veuillez saisir les termes en allemand pour le moment — l'extension à d'autres langues suivra en phase 2.",
+    tabLabel: "Compétence",
+    tabPageTitle: "Navigation des compétences",
+    tabPageSub:
+      "Qui décide de quoi ? Saisissez un sujet, voyez le niveau + la confiance, trouvez les canaux UE adaptés.",
+    tabInputPlaceholder: "Saisir un sujet… p. ex. prix de l'électricité, taxe sur les chiens, crèche",
+    tabFullPageLink: "Ouvrir la vue complète →",
+    tabExamples: "Exemples",
+    levels: {
+      EU: "UE",
+      Bund: "Fédéral",
+      Land: "Land",
+      Kreis: "Arrondissement",
+      Kommune: "Commune",
+    },
+    competence: {
+      ausschliesslich_bund: "Fédéral — exclusif",
+      konkurrierend: "Fédéral/Land — concurrent",
+      abweichungsrecht: "Fédéral/Land — droit de dérogation",
+      rahmen: "Fédéral — cadre",
+      laender_ausschliesslich: "Land — exclusif",
+      kommunal: "Autonomie communale",
+      exclusive: "UE — exclusive",
+      shared: "UE/État — partagée",
+      shared_parallel: "UE/État — parallèle",
+      coordinating: "UE — coordination",
+      supporting: "UE — appui",
+      cfsp: "PESC",
+      residual: "Résiduelle (art. 30 GG)",
+      not_classified: "Non classée",
+    },
+  },
+
+  es: {
+    testBanner:
+      "TEST · En la versión final, la competencia solo se mostrará cuando la propuesta alcance madurez, junto con reenvío y retroalimentación.",
+    dismissAria: "Descartar aviso",
+    previewTitle: "Competencia (en vivo)",
+    waiting: "Empieza a escribir — la verificación de competencia se realiza automáticamente.",
+    noMatch:
+      "No se detectó un tema claro. Introduce un ámbito político concreto (p. ej. precios de electricidad, escuela, asilo, residuos).",
+    primaryLabel: "Nivel principal",
+    secondaryLabel: "También afectado",
+    confidenceLabel: "Confianza",
+    competenceLabel: "Tipo de competencia",
+    matchLabel: "Tema detectado",
+    showDetails: "Detalles",
+    hideDetails: "menos",
+    searchLanguageHint:
+      "Por ahora introduce los términos de búsqueda en alemán — la ampliación a otros idiomas llegará en fase 2.",
+    tabLabel: "Competencia",
+    tabPageTitle: "Navegación de competencias",
+    tabPageSub:
+      "¿Quién decide sobre qué? Introduce un tema, ve el nivel + la confianza, encuentra los canales UE adecuados.",
+    tabInputPlaceholder: "Introducir tema… p. ej. precios de electricidad, impuesto canino, guardería",
+    tabFullPageLink: "Abrir vista completa →",
+    tabExamples: "Ejemplos",
+    levels: {
+      EU: "UE",
+      Bund: "Federal",
+      Land: "Land",
+      Kreis: "Distrito",
+      Kommune: "Municipio",
+    },
+    competence: {
+      ausschliesslich_bund: "Federal — exclusiva",
+      konkurrierend: "Federal/Land — concurrente",
+      abweichungsrecht: "Federal/Land — derecho de excepción",
+      rahmen: "Federal — marco",
+      laender_ausschliesslich: "Land — exclusiva",
+      kommunal: "Autonomía municipal",
+      exclusive: "UE — exclusiva",
+      shared: "UE/Estado — compartida",
+      shared_parallel: "UE/Estado — paralela",
+      coordinating: "UE — coordinadora",
+      supporting: "UE — de apoyo",
+      cfsp: "PESC",
+      residual: "Residual (art. 30 GG)",
+      not_classified: "No clasificada",
+    },
+  },
+
+  // Indonesian — shipping landing/audio already; include for completeness.
+  id: {
+    testBanner:
+      "TEST · Dalam versi final, yurisdiksi hanya ditampilkan setelah usulan mencapai kematangan, dengan fungsi penerusan dan umpan balik.",
+    dismissAria: "Tutup pemberitahuan",
+    previewTitle: "Yurisdiksi (langsung)",
+    waiting: "Mulai menulis — pemeriksaan yurisdiksi berjalan otomatis.",
+    noMatch:
+      "Tidak ada topik yang dikenali. Masukkan bidang kebijakan konkret (mis. harga listrik, sekolah, suaka, sampah).",
+    primaryLabel: "Tingkat utama",
+    secondaryLabel: "Juga terpengaruh",
+    confidenceLabel: "Kepercayaan",
+    competenceLabel: "Jenis kompetensi",
+    matchLabel: "Topik terdeteksi",
+    showDetails: "Detail",
+    hideDetails: "kurangi",
+    searchLanguageHint:
+      "Untuk saat ini masukkan istilah dalam bahasa Jerman — bahasa lain menyusul pada fase 2.",
+    tabLabel: "Yurisdiksi",
+    tabPageTitle: "Navigasi yurisdiksi",
+    tabPageSub:
+      "Siapa memutuskan apa? Masukkan topik, lihat tingkat + kepercayaan, temukan saluran UE yang sesuai.",
+    tabInputPlaceholder: "Masukkan topik… mis. harga listrik, pajak anjing, penitipan anak",
+    tabFullPageLink: "Buka tampilan penuh →",
+    tabExamples: "Contoh",
+    levels: {
+      EU: "UE",
+      Bund: "Federal",
+      Land: "Negara bagian",
+      Kreis: "Distrik",
+      Kommune: "Kota",
+    },
+    competence: {
+      ausschliesslich_bund: "Federal — eksklusif",
+      konkurrierend: "Federal/Negara — konkuren",
+      abweichungsrecht: "Federal/Negara — hak deviasi",
+      rahmen: "Federal — kerangka",
+      laender_ausschliesslich: "Negara bagian — eksklusif",
+      kommunal: "Otonomi kota",
+      exclusive: "UE — eksklusif",
+      shared: "UE/Anggota — bersama",
+      shared_parallel: "UE/Anggota — paralel",
+      coordinating: "UE — koordinasi",
+      supporting: "UE — pendukung",
+      cfsp: "CFSP",
+      residual: "Residual (Pasal 30 GG)",
+      not_classified: "Tidak diklasifikasikan",
+    },
+  },
+};
+
+export function getZustT(lang) {
+  return zustI18n[lang] || zustI18n.de;
+}
+
+// Example queries — kept German (engine expects DE tokens in phase 1).
+export const EXAMPLE_QUERIES = [
+  "Strompreise",
+  "Hundesteuer",
+  "Asyl",
+  "Schule",
+  "Müll",
+  "Kernenergie",
+  "Handel",
+  "Bundeswehr",
+];

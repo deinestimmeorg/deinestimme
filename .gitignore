@@ -1,5 +1,12 @@
 node_modules
 dist
+dist-*/
 .env
 .env.local
 .DS_Store
+
+# libreoffice leftover (cannot be deleted due to macOS perms); clean artifacts live in public/engine/files/
+public/engine/downloads/
+
+# Vite dev-server temp config files
+vite.config.js.timestamp-*

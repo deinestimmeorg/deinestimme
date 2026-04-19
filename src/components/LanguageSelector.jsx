@@ -3,6 +3,9 @@ import { T } from "../tokens";
 const LANGUAGES = [
   { code: "de", label: "Deutsch", greeting: "Willkommen", sub: "Sprache wählen" },
   { code: "en", label: "English", greeting: "Welcome", sub: "Choose language" },
+  { code: "nl", label: "Nederlands", greeting: "Welkom", sub: "Kies taal" },
+  { code: "fr", label: "Français", greeting: "Bienvenue", sub: "Choisir la langue" },
+  { code: "es", label: "Español", greeting: "Bienvenido", sub: "Elige idioma" },
   { code: "id", label: "Bahasa Indonesia", greeting: "Selamat datang", sub: "Pilih bahasa" },
 ];
 
@@ -161,6 +164,10 @@ export const translations = {
 
 export function useTranslation() {
   const lang = localStorage.getItem("ds_lang") || "de";
-  const t = translations[lang] || translations.de;
+  // translations only cover de/en/id today. For nl/fr/es we fall back to EN (closer to most users' second language).
+  const t =
+    translations[lang] ||
+    (lang === "de" ? translations.de : translations.en) ||
+    translations.de;
   return { t, lang };
 }

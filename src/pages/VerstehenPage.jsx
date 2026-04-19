@@ -19,7 +19,7 @@ const CONTENT = {
       { icon: "✦", name: "Vorschlag schreiben", desc: "Du beschreibst, was dich beschäftigt. Während du schreibst, zeigt dir das System, ob du gerade das Problem beschreibst oder bereits eine Lösung formulierst. Beides ist wertvoll.", status: "live" },
       { icon: "◈", name: "Wirkungsanalyse", desc: "Jeder Vorschlag wird in sechs Dimensionen betrachtet: Wirtschaft, Gesundheit, Bildung, Technik, Soziales, Umwelt. Chancen und Gefahren werden sichtbar — und für jede Gefahr gibt es einen Raum für Lösungen.", status: "live" },
       { icon: "◎", name: "Schreibkompass", desc: "Ein Analysewerkzeug, das Informationsdichte, Wiederholungen, rhetorische Balance und Konzeptüberlappung misst. Damit werden Vorschläge klarer — ohne dass du Verwaltungssprache lernen musst.", status: "live" },
-      { icon: "⬡", name: "Zuständigkeitsnavigation", desc: "Wer ist zuständig? Gemeinde, Land, Bund oder EU? Das System zeigt dir, welche Ebene für dein Thema verantwortlich ist — damit dein Vorschlag an der richtigen Stelle ankommt.", status: "geplant" },
+      { icon: "⬡", name: "Zuständigkeitsnavigation", desc: "Wer ist zuständig? Gemeinde, Land, Bund oder EU? Das System zeigt dir, welche Ebene für dein Thema verantwortlich ist — damit dein Vorschlag an der richtigen Stelle ankommt.", status: "live", href: "/zustaendigkeit" },
       { icon: "◇", name: "Gegenvorschlag", desc: "Du bist nicht einverstanden? Dann schreibe einen besseren Vorschlag. Beide werden nebeneinander gestellt, verglichen und von der Gemeinschaft verfeinert.", status: "geplant" },
     ],
     flowTitle: "Der Ablauf",
@@ -46,7 +46,7 @@ const CONTENT = {
       { icon: "✦", name: "Write a proposal", desc: "Describe what concerns you. As you write, the system shows whether you're describing the problem or already formulating a solution. Both are valuable.", status: "live" },
       { icon: "◈", name: "Impact assessment", desc: "Every proposal is examined across six dimensions: economy, health, education, technology, social, environment. Opportunities and risks become visible — and each risk has space for solutions.", status: "live" },
       { icon: "◎", name: "Schreibkompass", desc: "An analysis tool measuring information density, repetition, rhetorical balance and concept overlap. It helps proposals become clearer — without requiring formal policy language.", status: "live" },
-      { icon: "⬡", name: "Jurisdiction navigation", desc: "Who is responsible? Municipality, state, federal or EU? The system shows which level of government is responsible for your topic — so your proposal reaches the right place.", status: "planned" },
+      { icon: "⬡", name: "Jurisdiction navigation", desc: "Who is responsible? Municipality, state, federal or EU? The system shows which level of government is responsible for your topic — so your proposal reaches the right place.", status: "live", href: "/zustaendigkeit" },
       { icon: "◇", name: "Counter-proposal", desc: "You disagree? Then write a better proposal. Both are placed side by side, compared and refined by the community.", status: "planned" },
     ],
     flowTitle: "The process",
@@ -113,28 +113,42 @@ export default function VerstehenPage() {
       <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 24px 40px" }}>
         <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: T, letterSpacing: ".15em", textTransform: "uppercase", display: "block", marginBottom: "20px" }}>{c.modulesTitle}</span>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {c.modules.map((m, i) => (
-            <div key={i} style={{
+          {c.modules.map((m, i) => {
+            const inner = (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "16px", color: T }}>{m.icon}</span>
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px", fontWeight: 400, color: SILVER }}>{m.name}</span>
+                    {m.href && <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: T, marginLeft: "4px" }}>→</span>}
+                  </div>
+                  <span style={{
+                    fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: ".1em",
+                    textTransform: "uppercase",
+                    color: m.status === "live" ? T : "#E8943A",
+                    background: m.status === "live" ? T + "15" : "#E8943A15",
+                    padding: "3px 8px", borderRadius: "2px",
+                  }}>{m.status === "live" ? "LIVE" : (lang === "de" ? "GEPLANT" : "PLANNED")}</span>
+                </div>
+                <p style={{ fontFamily: "'Crimson Pro', serif", fontSize: "15px", lineHeight: 1.7, color: DIM, fontWeight: 300 }}>{m.desc}</p>
+              </>
+            );
+            const baseStyle = {
               background: CARD, border: `1px solid ${T}10`, borderRadius: "4px", padding: "20px 24px",
               opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(16px)",
               transition: `all 0.6s ease ${200 + i * 100}ms`,
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "16px", color: T }}>{m.icon}</span>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px", fontWeight: 400, color: SILVER }}>{m.name}</span>
-                </div>
-                <span style={{
-                  fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: ".1em",
-                  textTransform: "uppercase",
-                  color: m.status === "live" ? T : "#E8943A",
-                  background: m.status === "live" ? T + "15" : "#E8943A15",
-                  padding: "3px 8px", borderRadius: "2px",
-                }}>{m.status === "live" ? "LIVE" : (lang === "de" ? "GEPLANT" : "PLANNED")}</span>
-              </div>
-              <p style={{ fontFamily: "'Crimson Pro', serif", fontSize: "15px", lineHeight: 1.7, color: DIM, fontWeight: 300 }}>{m.desc}</p>
-            </div>
-          ))}
+              display: "block", textDecoration: "none", color: "inherit",
+            };
+            if (m.href) {
+              return (
+                <a key={i} href={m.href} style={{ ...baseStyle, cursor: "pointer" }}
+                   onMouseEnter={(e) => { e.currentTarget.style.border = `1px solid ${T}40`; e.currentTarget.style.background = "#161620"; }}
+                   onMouseLeave={(e) => { e.currentTarget.style.border = `1px solid ${T}10`; e.currentTarget.style.background = CARD; }}
+                >{inner}</a>
+              );
+            }
+            return <div key={i} style={baseStyle}>{inner}</div>;
+          })}
         </div>
       </div>
 
