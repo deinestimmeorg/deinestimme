@@ -327,6 +327,7 @@ export default function DeineStimmeApp() {
     { id: "zustaendigkeit", label: zt.tabLabel, group: "werkzeuge" },
     { id: "schreibkompass", label: "Schreibkompass", group: "werkzeuge" },
     { id: "vertragsanalyse", label: "Vertragsanalyse", group: "werkzeuge" },
+    { id: "engine", label: "Technische Architektur", group: "werkzeuge", external: "/engine/" },
   ];
 
   return (
@@ -389,14 +390,19 @@ export default function DeineStimmeApp() {
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
           <span style={{ color: T.textDim, fontSize: 9, fontFamily: T.mono, marginRight: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>werkzeuge</span>
           {tabs.filter(t => t.group === "werkzeuge").map(t => (
-            <button key={t.id} onClick={() => setView(t.id)} style={{
+            <button key={t.id} onClick={() => {
+              if (t.external) { window.open(t.external, "_blank", "noopener,noreferrer"); return; }
+              setView(t.id);
+            }} style={{
               background: view === t.id ? T.accentDim : "transparent",
               border: `1px solid ${view === t.id ? T.accent + "44" : "transparent"}`,
               borderRadius: T.r, padding: "6px 12px",
               color: view === t.id ? T.accent : T.textMuted,
               fontSize: 11, fontFamily: T.mono, cursor: "pointer",
               fontWeight: view === t.id ? 600 : 400,
-            }}>{t.label}</button>
+            }} title={t.external ? `Öffnet ${t.external} in neuem Tab` : undefined}>
+              {t.label}{t.external && <span style={{ marginLeft: 4, opacity: 0.6, fontSize: 9 }}>↗</span>}
+            </button>
           ))}
         </div>
       </div>
